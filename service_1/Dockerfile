@@ -2,8 +2,9 @@ FROM python:3.11.1-alpine
 
 WORKDIR /usr/src/application
 
-COPY . .
+COPY application/ .
+RUN pip install --no-cache-dir prometheus_api_client
 
-CMD ["python", "application/main.py"]
+CMD ["python", "main.py"]
 
 
