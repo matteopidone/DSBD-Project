@@ -11,4 +11,11 @@ services:
       - 9000:9000
     restart: always
 
-
+  service_2:
+    image: servizio_2
+    build: 
+      context: ./service_2
+      dockerfile: Dockerfile
+    ports:
+      - 9001:9001
+    restart: always

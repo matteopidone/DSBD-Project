@@ -1,10 +1,10 @@
-FROM python:3.11.1-alpine
+FROM python:3.10.1-alpine
 
 WORKDIR /usr/src/application
 
 COPY application/ .
-RUN pip install --no-cache-dir prometheus_api_client
+
+RUN apk add py3-pip
+RUN pip3 install prometheus-api-client
 
 CMD ["python", "main.py"]
-
-
