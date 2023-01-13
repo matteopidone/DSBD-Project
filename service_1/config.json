@@ -1,0 +1,33 @@
+{
+    "job_name" : "host",
+    "metrics" : [
+        {
+            "metric_name" : "availableMem",
+            "start_time" : 1,
+            "end_time" : 2,
+            "scrape_interval" : 5,
+            "metadata" : {
+
+            }
+        },
+        {
+            "metric_name" : "node_disk_read_bytes_total",
+            "start_time" : 3,
+            "end_time" : 4,
+            "scrape_interval" : 10,
+            "metadata" : {
+                
+            }
+        },
+        {
+            "metric_name" : "node_cpu_seconds_total",
+            "start_time" : 5,
+            "end_time" : 6,
+            "scrape_interval" : 15,
+            "metadata" : {
+                "mode" : "idle",
+                "cpu" : "2"
+            }
+        }
+    ]
+}
