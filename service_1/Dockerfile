@@ -5,6 +5,6 @@ WORKDIR /usr/src/application
 COPY application/ .
 
 RUN apk add py3-pip
-RUN pip3 install prometheus-api-client
+RUN pip3.10 install prometheus-api-client
 
 CMD ["python", "main.py"]
