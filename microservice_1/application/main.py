@@ -12,11 +12,13 @@ file.close()
 
 metrics_list = list()
 prom = PrometheusConnect(url="http://15.160.61.227:29090/", disable_ssl=True) # togliere l'url e metterlo in env
-queryResult = prom.get_current_metric_value(label_config={'job' : data['job_name']})
+queryResult = prom.custom_query(query='{job="' + data['job_name'] +'"}')
 
 for metric_info in queryResult :
-    if metric_info['metric']['__name__'] == data['job_name']['metric_name'] :
-        print(metric_info['metric']['__name__'])
+    for metrics in data['metrics']:
+        if metric_info['metric']['__name__'] == metrics['metric_name']:
+            metric_info_json = json.loads(metric_info)
+            print(metric_info_json)
 
 #metric_df = MetricSnapshotDataFrame(queryResult)
 #print(metric_df)
