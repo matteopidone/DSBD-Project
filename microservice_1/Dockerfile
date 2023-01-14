@@ -7,7 +7,7 @@ COPY config.json ../
 # Commands to remove
 RUN apt-get update
 RUN apt-get upgrade -y
-RUN apt-get install vim
+RUN apt-get install vim -y
 # End
 
 RUN pip install --no-cache-dir prometheus-api-client

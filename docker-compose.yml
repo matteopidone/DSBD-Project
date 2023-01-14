@@ -16,15 +16,11 @@ services:
     build: 
       context: ./microservice_2
       dockerfile: Dockerfile
-    ports:
-      - 9001:9000
     restart: always
-    command: --default-authentication-plugin=mysql_native_password
-    environment:
-      MYSQL_ROOT_PASSWORD: password
+    command: --default-authentication-plugin=mysql_native_password #da spostare nel dockerfile se possibile
 
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - 8080:8080
+  #adminer:
+  #  image: adminer
+  #  restart: always
+  #  ports:
+  #    - 8080:8080

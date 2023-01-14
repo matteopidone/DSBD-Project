@@ -1,5 +1,11 @@
 FROM mysql:8-debian
 
+ENV MYSQL_ROOT_PASSWORD=password
+ENV MYSQL_DATABASE=database
+# MYSQL_USER : user
+# MYSQL_PASSWORD: password
+# --default-authentication-plugin=mysql_native_password
+
 WORKDIR /usr/src/application
 COPY application/ ./
 
@@ -13,4 +19,4 @@ RUN apt-get install vim -y
 RUN apt-get install python3-pip -y
 RUN pip install --no-cache-dir mysql-connector-python
 
-CMD ["python3.9", "main.py"]
+CMD ["python3.9", "init.py"]
