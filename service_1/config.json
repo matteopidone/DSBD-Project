@@ -1,0 +1,25 @@
+{
+    "job_name" : "host",
+    "range_time": "1w",
+    "metrics" : [
+        {
+            "metric_name" : "availableMem",
+            "metadata" : {
+
+            }
+        },
+        {
+            "metric_name" : "node_disk_read_bytes_total",
+            "metadata" : {
+                
+            }
+        },
+        {
+            "metric_name" : "node_cpu_seconds_total",
+            "metadata" : {
+                "mode" : "idle",
+                "cpu" : "2"
+            }
+        }
+    ]
+}
