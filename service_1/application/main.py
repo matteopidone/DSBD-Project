@@ -18,16 +18,17 @@ file.close()
 
 metrics_list = list()
 prom = PrometheusConnect(url="http://15.160.61.227:29090/", disable_ssl=True) # togliere l'url e metterlo in env
-queryResult = prom.custom_query(query='{job="' + data['job_name'] +'"}')
+queryResult = prom.custom_query(query='{job="' + data['job_name'] +'"}[' + data['range_time'] +']')
 
 for metric_info in queryResult :
     for metrics in data['metrics']:
         if metric_info['metric']['__name__'] == metrics['metric_name']:
             if( is_subset( metrics['metadata'], metric_info['metric'] ) ):
-                print(metric_info['metric'])
-#metric_df = MetricSnapshotDataFrame(queryResult)
-#print(metric_df)
-#print(metric_df["__name__"][1])
-#print(metric_df["timestamp"][1])
+                #metriche desiderate
+                metrics_list.append(metric_info)
+print(metrics_list)
+maxx = 10
+minn = 2
+dev_std = 150
 
-#print(metric_df["value"][1])
+#calcolo staginalità, min, max
