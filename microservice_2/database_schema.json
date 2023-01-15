@@ -1,0 +1,65 @@
+{
+    "tables" : [
+        {
+            "name":"metriche",
+            "columns": [
+                {
+                    "name":"id",
+                    "type":"INT(11) AUTO_INCREMENT NOT NULL"
+                },
+                {
+                    "name":"nome",
+                    "type":"VARCHAR(255) NOT NULL"
+                }
+            ],
+            "primary_key": "PRIMARY KEY (id)",
+            "foreign_key": ""
+        },
+        {
+            "name":"statistiche",
+            "columns": [
+                {
+                    "name":"id",
+                    "type":"INT(11) AUTO_INCREMENT NOT NULL"
+                },
+                {
+                    "name":"nome",
+                    "type":"VARCHAR(255) NOT NULL"
+                }
+            ],
+            "primary_key": "PRIMARY KEY (id)",
+            "foreign_key": ""
+        },
+        {
+            "name":"statistiche_metriche",
+            "columns": [
+                {
+                    "name":"id_metrica",
+                    "type":"INT(11) NOT NULL"
+                },
+                {
+                    "name":"id_statistica",
+                    "type":"INT(11) NOT NULL"
+                },
+                {
+                    "name":"timestamp",
+                    "type":"INT(11) NOT NULL"
+                },
+                {
+                    "name":"1h",
+                    "type":"INT(11)"
+                },
+                {
+                    "name":"3h",
+                    "type":"INT(11)"
+                },
+                {
+                    "name":"12h",
+                    "type":"INT(11)"
+                }
+            ],
+            "primary_key": "PRIMARY KEY (id_metrica, id_statistica, timestamp)",
+            "foreign_key": "FOREIGN KEY (id_metrica) REFERENCES metriche(id), FOREIGN KEY (id_statistica) REFERENCES statistiche(id)"
+        }
+   ]
+}

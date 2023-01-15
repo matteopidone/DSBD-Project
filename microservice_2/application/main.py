@@ -1,23 +1,9 @@
-import mysql.connector
+from connect_to_db import connect
 
-#https://www.w3schools.com/python/python_mysql_getstarted.asp
+database = connect()
+cursor = database.cursor()
 
-print("Start")
-mydb = mysql.connector.connect(
-  host="localhost",
-  user="root",
-  password="password",
-  database="database"
-)
+cursor.execute("SHOW TABLES")
 
-print(mydb)
-
-mycursor = mydb.cursor()
-
-sql = "SELECT * FROM customers"
-mycursor.execute(sql)
-
-result = mycursor.fetchall()
-
-for x in result:
+for x in cursor:
     print(x)

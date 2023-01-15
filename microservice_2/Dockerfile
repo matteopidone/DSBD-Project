@@ -8,6 +8,7 @@ ENV MYSQL_DATABASE=database
 
 WORKDIR /usr/src/application
 COPY application/ ./
+COPY database_schema.json ../
 
 # Commands to remove
 RUN apt-get update
