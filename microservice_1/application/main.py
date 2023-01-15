@@ -18,12 +18,12 @@ file.close()
 
 metrics_list = list()
 prom = PrometheusConnect(url="http://15.160.61.227:29090/", disable_ssl=True) # togliere l'url e metterlo in env
-queryResult = prom.custom_query(query='{job="' + data['job_name'] +'"}[' + data['range_time'] +']')
+queryResult = prom.custom_query(query='{job="' + data['job'] +'"}[' + data['range_time'] +']')
 
 for metricResultQuery in queryResult :
     for metric in data['metrics']:
-        if metricResultQuery['metric']['__name__'] == metric['metric_name']:
-            if( is_subset( metric['metadata'], metricResultQuery['metric'] ) ):
+        if metricResultQuery['metric']['__name__'] == metric['name']:
+            if( is_subset( metric['labels'], metricResultQuery['metric'] ) ):
                 #metriche desiderate
                 metrics_list.append(metricResultQuery)
                 break

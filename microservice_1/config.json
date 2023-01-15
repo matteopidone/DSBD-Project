@@ -1,22 +1,22 @@
 {
-    "job_name" : "host",
+    "job" : "host",
     "range_time": "1w",
     "metrics" : [
         {
-            "metric_name" : "availableMem",
-            "metadata" : {
+            "name" : "availableMem",
+            "labels" : {
 
             }
         },
         {
-            "metric_name" : "node_disk_read_bytes_total",
-            "metadata" : {
+            "name" : "node_disk_read_bytes_total",
+            "labels" : {
                 
             }
         },
         {
-            "metric_name" : "node_cpu_seconds_total",
-            "metadata" : {
+            "name" : "node_cpu_seconds_total",
+            "labels" : {
                 "mode" : "idle",
                 "cpu" : "2"
             }
