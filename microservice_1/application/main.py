@@ -1,8 +1,10 @@
 from prometheus_api_client import PrometheusConnect, MetricsList, MetricSnapshotDataFrame, MetricRangeDataFrame
 from datetime import timedelta
 from prometheus_api_client.utils import parse_datetime
-
+from confluent_kafka import Producer
+import sys
 import json
+
 def is_subset(a, b):
     subset = {}
     for k, v in a.items():
@@ -32,4 +34,38 @@ maxx = 10
 minn = 2
 dev_std = 150
 
-#calcolo staginalità, min, max
+#calcolo stagionalità, min, max
+
+#invio topic kafka
+broker = "localhost:/9092"
+topic = "prometheusdata"
+conf = {'bootstrap.servers': broker}
+
+p = Producer(**conf)
+
+def delivery_callback(err, msg):
+    if err:
+        sys.stderr.write('%% Message failed delivery: %s\n' % err)
+    else:
+        sys.stderr.write('%% Message delivered to %s, partition[%d] @ %d\n' %
+                            (msg.topic(), msg.partition(), msg.offset()))
+
+try:
+    record_key = "Prod#1"
+    record_value = json.dumps({'count': '1'})
+    print("Producing record: {}\t{}".format(record_key, record_value))
+    p.produce(topic, key=record_key, value=record_value, callback=delivery_callback)
+
+except BufferError:
+    sys.stderr.write('%% Local producer queue is full (%d messages awaiting delivery): try again\n' %
+                        len(p))
+
+# Serve delivery callback queue.
+# NOTE: Since produce() is an asynchronous API this poll() call
+#       will most likely not serve the delivery callback for the
+#       last produce()d message.
+p.poll(0)
+
+# Wait until all messages have been delivered
+sys.stderr.write('%% Waiting for %d deliveries\n' % len(p))
+p.flush()
