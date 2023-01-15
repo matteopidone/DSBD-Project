@@ -20,12 +20,13 @@ metrics_list = list()
 prom = PrometheusConnect(url="http://15.160.61.227:29090/", disable_ssl=True) # togliere l'url e metterlo in env
 queryResult = prom.custom_query(query='{job="' + data['job_name'] +'"}[' + data['range_time'] +']')
 
-for metric_info in queryResult :
-    for metrics in data['metrics']:
-        if metric_info['metric']['__name__'] == metrics['metric_name']:
-            if( is_subset( metrics['metadata'], metric_info['metric'] ) ):
+for metricResultQuery in queryResult :
+    for metric in data['metrics']:
+        if metricResultQuery['metric']['__name__'] == metric['metric_name']:
+            if( is_subset( metric['metadata'], metricResultQuery['metric'] ) ):
                 #metriche desiderate
-                metrics_list.append(metric_info)
+                metrics_list.append(metricResultQuery)
+                break
 print(metrics_list)
 maxx = 10
 minn = 2
