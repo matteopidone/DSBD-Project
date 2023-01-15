@@ -2,13 +2,25 @@ version: '3'
 
 services:
 
-  service_1:
+  microservice_1:
     image: etl_data_pipeline
     build: 
-      context: ./service_1
+      context: ./microservice_1
       dockerfile: Dockerfile
     ports:
       - 9000:9000
     restart: always
 
+  microservice_2:
+    image: data_storage
+    build: 
+      context: ./microservice_2
+      dockerfile: Dockerfile
+    restart: always
+    command: --default-authentication-plugin=mysql_native_password #da spostare nel dockerfile se possibile
 
+  #adminer:
+  #  image: adminer
+  #  restart: always
+  #  ports:
+  #    - 8080:8080
