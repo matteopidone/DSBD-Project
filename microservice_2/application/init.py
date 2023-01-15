@@ -1,21 +1,21 @@
-import mysql.connector
+from connect_to_db import connect
+import json
 
-mydb = mysql.connector.connect(
-  host="localhost",
-  user="root",
-  password="password",
-  database="database"
-)
+database = connect()
+cursor = database.cursor()
 
-mycursor = mydb.cursor()
+# try and catch da inserire
+file = open("../database_schema.json", "r")
+data = json.load(file)
+file.close()
 
-sql = "CREATE TABLE customers (name VARCHAR(255), address VARCHAR(255))"
-mycursor.execute(sql)
-
-sql = "INSERT INTO customers (name, address) VALUES (%s, %s)"
-
-data = [("John", "Highway 21"), ("Mario", "Lighway 45"), ("Tron", "Dark 13")]
-for val in data :
-    mycursor.execute(sql, val)
-    mydb.commit()
-    print(mycursor.rowcount, "record inserted.")
+for table in data['tables']:
+  query = "CREATE TABLE " + table['name'] + " ( "
+  for column in table['columns']:
+    query += column['name'] + " " + column['type'] + ", "
+  query += table['primary_key']
+  if table['foreign_key']:
+    query += ", " + table['foreign_key']
+  query += " );"
+  cursor.execute(query)
+  print("Table '" + table['name'] + "' created")
