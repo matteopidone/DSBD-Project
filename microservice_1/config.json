@@ -1,30 +1,22 @@
 {
-    "job_name" : "host",
+    "job" : "host",
+    "range_time": "1w",
     "metrics" : [
         {
-            "metric_name" : "availableMem",
-            "start_time" : 1,
-            "end_time" : 2,
-            "scrape_interval" : 5,
-            "metadata" : {
+            "name" : "availableMem",
+            "labels" : {
 
             }
         },
         {
-            "metric_name" : "node_disk_read_bytes_total",
-            "start_time" : 3,
-            "end_time" : 4,
-            "scrape_interval" : 10,
-            "metadata" : {
+            "name" : "node_disk_read_bytes_total",
+            "labels" : {
                 
             }
         },
         {
-            "metric_name" : "node_cpu_seconds_total",
-            "start_time" : 5,
-            "end_time" : 6,
-            "scrape_interval" : 15,
-            "metadata" : {
+            "name" : "node_cpu_seconds_total",
+            "labels" : {
                 "mode" : "idle",
                 "cpu" : "2"
             }

@@ -3,6 +3,12 @@ from datetime import timedelta
 from prometheus_api_client.utils import parse_datetime
 
 import json
+def is_subset(a, b):
+    subset = {}
+    for k, v in a.items():
+        if k in b:
+            subset[k] = b[k]
+    return subset == a
 
 # try and catch da inserire
 
@@ -12,14 +18,18 @@ file.close()
 
 metrics_list = list()
 prom = PrometheusConnect(url="http://15.160.61.227:29090/", disable_ssl=True) # togliere l'url e metterlo in env
-queryResult = prom.get_current_metric_value(label_config={'job' : data['job_name']})
+queryResult = prom.custom_query(query='{job="' + data['job'] +'"}[' + data['range_time'] +']')
 
-for metric_info in queryResult :
-    if metric_info['metric']['__name__'] == data['job_name']['metric_name'] :
-        print(metric_info['metric']['__name__'])
+for metricResultQuery in queryResult :
+    for metric in data['metrics']:
+        if metricResultQuery['metric']['__name__'] == metric['name']:
+            if( is_subset( metric['labels'], metricResultQuery['metric'] ) ):
+                #metriche desiderate
+                metrics_list.append(metricResultQuery)
+                break
+print(metrics_list)
+maxx = 10
+minn = 2
+dev_std = 150
 
-#metric_df = MetricSnapshotDataFrame(queryResult)
-#print(metric_df)
-#print(metric_df["__name__"][1])
-#print(metric_df["timestamp"][1])
-#print(metric_df["value"][1])
+#calcolo staginalità, min, max
