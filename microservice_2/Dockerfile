@@ -14,6 +14,7 @@ COPY database_schema.json ../
 RUN apt-get update
 RUN apt-get upgrade -y
 RUN apt-get install vim -y
+RUN pip install requests
 # End
 
 # questo python è abbastanza pesante -> python3.9 e pip (20.3.4)

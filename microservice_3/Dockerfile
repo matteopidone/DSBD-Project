@@ -9,4 +9,6 @@ RUN apt-get upgrade -y
 RUN apt-get install vim -y
 # End
 
-CMD ["python", "main.py"]
+RUN pip install --no-cache-dir Flask
+
+CMD ["flask", "--app", "main", "run", "--host=0.0.0.0", "--port=9000"]
