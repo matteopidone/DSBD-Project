@@ -16,8 +16,6 @@ services:
     build: 
       context: ./microservice_2
       dockerfile: Dockerfile
-    ports:
-      - 9002:9000
     restart: always
     command: --default-authentication-plugin=mysql_native_password #da spostare nel dockerfile se possibile
 
@@ -30,7 +28,7 @@ services:
       - 9003:9000
     restart: always
     environment:
-      - DATA_STORAGE_ADDRESS=microservice_2:9000
+      - DATA_STORAGE_HOST=microservice_2
 
   #adminer:
   #  image: adminer
