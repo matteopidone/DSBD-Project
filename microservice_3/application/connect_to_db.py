@@ -3,7 +3,7 @@ import os
 
 def connect():
     return mysql.connector.connect(
-        host=os.environ['DATA_STORAGE_HOST'],
+        host=os.environ['MYSQL_HOST'],
         user="root",
         password="password",
         database="database"
