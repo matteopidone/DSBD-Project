@@ -29,7 +29,6 @@ for metricResultQuery in queryResult :
                 #metriche desiderate
                 metrics_list.append(metricResultQuery)
                 break
-print(metrics_list)
 maxx = 10
 minn = 2
 dev_std = 150
