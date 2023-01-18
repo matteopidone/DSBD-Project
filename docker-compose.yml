@@ -19,6 +19,17 @@ services:
     restart: always
     command: --default-authentication-plugin=mysql_native_password #da spostare nel dockerfile se possibile
 
+  microservice_3:
+    image: data_retrieval
+    build: 
+      context: ./microservice_3
+      dockerfile: Dockerfile
+    ports:
+      - 9003:9000
+    restart: always
+    environment:
+      - DATA_STORAGE_HOST=microservice_2
+
   #adminer:
   #  image: adminer
   #  restart: always
