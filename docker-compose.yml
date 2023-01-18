@@ -9,6 +9,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - 9000:9000
+    depends_on:
+      - kafka
     restart: always
 
   microservice_2:
