@@ -10,11 +10,6 @@ RUN apt-get update
 RUN apt-get upgrade -y
 RUN apt-get install vim -y
 # End
-RUN apt-get install -y --no-install-recommends gcc git libssl-dev g++ make && \
-  cd /tmp && git clone https://github.com/edenhill/librdkafka.git && \
-  cd librdkafka && git checkout tags/v1.9.0 && \
-  ./configure && make && make install && ldconfig && \
-  cd ../ && rm -rf librdkafka && cd
 
 RUN pip install --no-cache-dir -r ../py_libraries.txt
 CMD ["python", "main.py"]

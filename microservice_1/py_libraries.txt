@@ -1,2 +1,2 @@
 prometheus-api-client
-confluent-kafka
+kafka-python
