@@ -38,6 +38,18 @@ def test():
     close(database)
     return response
 
+@app.route("/<id_metric>/metadata/")
+def get_metadata_for_metrics(id_metric):
+    database = connect()
+    cursor = database.cursor()
+    cursor.execute("Select nome, metadata FROM metriche WHERE id = %s LIMIT 1", (id_metric,))
+    name, metadata = cursor.fetchone()
+    response = "<h1 style='text-align: center'>Lista di Metadati per " + str(name) +"</h1><table><tr><th>Metadati</th></tr>"
+    response = response + "<tr><td>" + str(metadata) + "</td></tr></table>"
+    cursor.close()
+    close(database)
+    return response
+
 @app.route("/test/json")
 def test_json():
     return json.dumps(data)
