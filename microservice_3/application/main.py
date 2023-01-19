@@ -25,15 +25,18 @@ def hello_world():
 def test():
     database = connect()
     cursor = database.cursor()
-    cursor.execute("SELECT * FROM statistiche")
-    '''
-    if(data == False):
-        return "<p>Errore, riprovare più tardi</p>"
-    '''  
-    query_result = cursor.fetchall()
-    cursor.close()
-    close(database)
-    return render_template('metrics.html', results=query_result)
+    try:
+        cursor.execute("SELECT * FROM statistiche")
+        query_result = cursor.fetchall()
+        if query_result :
+            return render_template('metrics.html', results=query_result)
+        else :
+            return "<p>Nessuna Metrica al momento è disponibile</p>"
+    except Error as e:
+        print("Error while execute the query", e)
+    finally:
+        cursor.close()
+        close(database)
 
 @app.route("/<id_metric>/metadata/")
 def get_metadata_for_metrics(id_metric):
