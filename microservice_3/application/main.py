@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 import json
 from connect_to_db import connect, close
 
@@ -29,14 +29,11 @@ def test():
     '''
     if(data == False):
         return "<p>Errore, riprovare più tardi</p>"
-    '''    
-    response = "<h1 style='text-align: center'>Lista di Metriche</h1><table><tr><th>ID Metrica</th><th>Nome Metrica</th></tr>"
-    for (id, nome) in cursor:
-        response = response + "<tr><td>" + str(id) + "</td>" + "<td>" + nome + "</td><tr>"
-    response = response + "</table>"
+    '''  
+    query_result = cursor.fetchall()
     cursor.close()
     close(database)
-    return response
+    return render_template('metrics.html', results=query_result)
 
 @app.route("/<id_metric>/metadata/")
 def get_metadata_for_metrics(id_metric):
