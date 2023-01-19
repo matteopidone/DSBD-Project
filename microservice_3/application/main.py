@@ -42,13 +42,18 @@ def test():
 def get_metadata_for_metrics(id_metric):
     database = connect()
     cursor = database.cursor()
-    cursor.execute("Select nome, metadata FROM metriche WHERE id = %s LIMIT 1", (id_metric,))
-    name, metadata = cursor.fetchone()
-    response = "<h1 style='text-align: center'>Lista di Metadati per " + str(name) +"</h1><table><tr><th>Metadati</th></tr>"
-    response = response + "<tr><td>" + str(metadata) + "</td></tr></table>"
-    cursor.close()
-    close(database)
-    return response
+    try:
+        cursor.execute("Select nome, metadata FROM metriche WHERE id = %s LIMIT 1", (id_metric,))
+        query_result = cursor.fetchone()
+        if query_result :
+            return  render_template('metrics_metadata.html', results=query_result)
+        else :
+            return "<p>Nessuna Metrica al momento è disponibile</p>"
+    except Error as e:
+        print("Error while execute the query", e)
+    finally:
+        cursor.close()
+        close(database)
 
 @app.route("/test/json")
 def test_json():
