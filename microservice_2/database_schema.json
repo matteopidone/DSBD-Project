@@ -10,6 +10,10 @@
                 {
                     "name":"nome",
                     "type":"VARCHAR(255) NOT NULL"
+                },
+                {
+                    "name":"metadata",
+                    "type":"VARCHAR(512)"
                 }
             ],
             "primary_key": "PRIMARY KEY (id)",
