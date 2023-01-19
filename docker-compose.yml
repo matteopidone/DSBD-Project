@@ -33,6 +33,8 @@ services:
     ports:
       - 9003:9000
     restart: always
+    depends_on:
+      - mysql
     environment:
       - MYSQL_HOST=mysql
 
