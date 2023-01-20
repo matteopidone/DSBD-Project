@@ -1,0 +1,20 @@
+<h1 style='text-align: center'>Lista di Statistiche</h1>
+<table>
+    <tr>
+        <th>Metrica</th>
+        <th>Statistica</th>
+        <th>1h</th>
+        <th>3h</th>
+        <th>12h</th>
+    </tr>
+    {% for row in results %}
+      <tr>
+         <td>{{ row[0] }}</td>
+         <td>{{ row[1] }}</td>
+         <td>{{ row[2] }}</td>
+         <td>{{ row[3] }}</td>
+         <td>{{ row[4] }}</td>
+
+      </tr>
+    {% endfor %}
+</table>

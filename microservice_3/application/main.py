@@ -55,6 +55,23 @@ def get_metadata_for_metrics(id_metric):
         cursor.close()
         close(database)
 
+@app.route("/<id_metric>/history/")
+def get_metadata_for_metrics_2(id_metric):
+    database = connect()
+    cursor = database.cursor()
+    try:
+        cursor.execute("SELECT metriche.nome, statistiche.nome, statistiche_metriche.1h, statistiche_metriche.3h, statistiche_metriche.12h FROM metriche JOIN statistiche_metriche ON metriche.id=statistiche_metriche.id_metrica JOIN statistiche on statistiche.id=statistiche_metriche.id_statistica WHERE metriche.id= %s", (id_metric,))
+        query_result = cursor.fetchall()
+        if query_result :
+            return  render_template('metrics_history.html', results=query_result)
+        else :
+            return "<p>Nessuna Metrica al momento è disponibile</p>"
+    except Error as e:
+        print("Error while execute the query", e)
+    finally:
+        cursor.close()
+        close(database)
+
 @app.route("/test/json")
 def test_json():
     return json.dumps(data)
