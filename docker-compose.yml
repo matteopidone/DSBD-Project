@@ -25,9 +25,11 @@ services:
       dockerfile: Dockerfile
     restart: always
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     environment:
-      - MYSQL_HOST=mysql
+      MYSQL_HOST: mysql
+      PYTHONUNBUFFERED: 1
 
   microservice_3:
     image: data_retrieval
@@ -39,19 +41,27 @@ services:
       - 9003:9000
     restart: always
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     environment:
-      - MYSQL_HOST=mysql
+      MYSQL_HOST: mysql
+      PYTHONUNBUFFERED: 1
 
   mysql:
     image: mysql:latest
     container_name: mysql_container
     environment:
-      - MYSQL_ROOT_PASSWORD=password
-      - MYSQL_DATABASE=database
-      ## MYSQL_USER : user
-      ## MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: database
+      #MYSQL_USER: user
+      #MYSQL_PASSWORD: password
     command: --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ["CMD", "curl", "http://localhost:3306"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 0s
 
   #adminer:
   #  image: adminer
