@@ -4,19 +4,6 @@ from connect_to_db import connect, close
 
 app = Flask(__name__)
 
-def execute(query):
-    database = connect()
-    cursor = database.cursor()
-    data = False
-    try:
-        cursor.execute(query)
-        data = cursor
-    except Error as e:
-        print("Error while execute the query", e)
-    print(data)
-    return data
-
-
 @app.route("/")
 def hello_world():
     return "<p>Hello, World!</p>"
