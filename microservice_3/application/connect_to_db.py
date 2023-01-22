@@ -22,18 +22,6 @@ def connect():
 
     return database
 
-def execute(query):
-    database = connect()
-    cursor = database.cursor()
-    data = False
-    try:
-        cursor.execute(query)
-        data = cursor
-    except Error as e:
-        print("Error while execute the query", e)
-    print(data)
-    return data
-
 def close(database):
     database.close()
 
