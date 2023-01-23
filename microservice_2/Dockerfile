@@ -11,5 +11,6 @@ RUN apt-get install vim -y
 # End
 
 RUN pip install --no-cache-dir mysql-connector-python
+RUN pip install --no-cache-dir kafka-python
 
 CMD ["python", "main.py"]
