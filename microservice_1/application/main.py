@@ -1,9 +1,16 @@
 from prometheus_api_client import PrometheusConnect, MetricsList, MetricSnapshotDataFrame, MetricRangeDataFrame
 from datetime import timedelta
 from prometheus_api_client.utils import parse_datetime
-from confluent_kafka import Producer
 import sys
 import json
+from MessageProducer import MessageProducerClass
+from threading import Thread
+
+
+
+broker = "kafka:9092"
+topic = "prova"
+message_producer = MessageProducerClass(broker, topic)
 
 def is_subset(a, b):
     subset = {}
@@ -11,6 +18,46 @@ def is_subset(a, b):
         if k in b:
             subset[k] = b[k]
     return subset == a
+
+def calculate_stats_values(metric, hours='1h'):
+    #Calcoli
+    #Record Key Stats#indice_metrica
+    data = {
+        'name': 'pippo',
+        'max': 10,
+        'min': 1,
+        'avg': 7
+    }
+    resp = message_producer.send_msg(data)
+    print(resp)
+    return resp
+
+def calculate_metadata_values(metric, hours='1h'):
+    #Calcoli
+    #Record Key Metadata#indice_metrica
+    data = {
+        'name': 'pippo',
+        'dev_std': 10,
+        'autocorrelazione': 1
+    }
+    resp = message_producer.send_msg(data)
+    print(resp)
+    return resp
+
+def calculate_prediction_values(metric, hours='1h'):
+    #Calcoli
+    #Record Key Prediction#indice_metrica
+    data = {
+        'name': 'pippo',
+        'max': 10,
+        'min': 1,
+        'avg': 7,
+        'dev_std': 4
+    }
+    resp = message_producer.send_msg(data)
+    print(resp)
+    return resp
+
 
 # try and catch da inserire
 
@@ -27,44 +74,18 @@ for metricResultQuery in queryResult :
         if metricResultQuery['metric']['__name__'] == metric['name']:
             if( is_subset( metric['labels'], metricResultQuery['metric'] ) ):
                 #metriche desiderate
+                '''
+                t1 = Thread(target=calculate_stats_values, args=(metricResultQuery,))
+                t1.start()
+                t2 = Thread(target=calculate_prediction_values(metrics_list), args=(metricResultQuery,))
+                t2.start()
+                t3 = Thread(target=calculate_metadata_values(metrics_list), args=(metricResultQuery,))
+                t3.start()
+                t1.join()
+                t2.join()
+                t3.join()'''
+                calculate_metadata_values(metric)
+                calculate_prediction_values(metric)
+                calculate_stats_values(metric)
                 metrics_list.append(metricResultQuery)
                 break
-maxx = 10
-minn = 2
-dev_std = 150
-
-#calcolo stagionalità, min, max
-
-#invio topic kafka
-broker = "localhost:/9092"
-topic = "prometheusdata"
-conf = {'bootstrap.servers': broker}
-
-p = Producer(**conf)
-
-def delivery_callback(err, msg):
-    if err:
-        sys.stderr.write('%% Message failed delivery: %s\n' % err)
-    else:
-        sys.stderr.write('%% Message delivered to %s, partition[%d] @ %d\n' %
-                            (msg.topic(), msg.partition(), msg.offset()))
-
-try:
-    record_key = "Prod#1"
-    record_value = json.dumps({'count': '1'})
-    print("Producing record: {}\t{}".format(record_key, record_value))
-    p.produce(topic, key=record_key, value=record_value, callback=delivery_callback)
-
-except BufferError:
-    sys.stderr.write('%% Local producer queue is full (%d messages awaiting delivery): try again\n' %
-                        len(p))
-
-# Serve delivery callback queue.
-# NOTE: Since produce() is an asynchronous API this poll() call
-#       will most likely not serve the delivery callback for the
-#       last produce()d message.
-p.poll(0)
-
-# Wait until all messages have been delivered
-sys.stderr.write('%% Waiting for %d deliveries\n' % len(p))
-p.flush()

@@ -1,7 +1,7 @@
 from kafka import KafkaProducer
 import json
 
-class MessageProducer:
+class MessageProducerClass:
     broker = ""
     topic = ""
     producer = None
@@ -21,19 +21,10 @@ class MessageProducer:
     def send_msg(self, msg):
         print("sending message...")
         try:
-            future = self.producer.send(self.topic,msg)
+            future = self.producer.send(self.topic, msg)
             self.producer.flush()
             future.get(timeout=60)
             print("message sent successfully...")
             return {'status_code':200, 'error':None}
         except Exception as ex:
             return ex
-
-
-broker = 'kafka:9092'
-topic = 'prova'
-message_producer = MessageProducer(broker,topic)
-
-data = {'name':'abc', 'email':'abc@example.com'}
-resp = message_producer.send_msg(data)
-print(resp)
