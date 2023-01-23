@@ -18,10 +18,10 @@ class MessageProducerClass:
         )
 
 
-    def send_msg(self, msg):
+    def send_msg(self, msg, partition_key):
         print("sending message...")
         try:
-            future = self.producer.send(self.topic, msg)
+            future = self.producer.send(self.topic, value=msg, partition=partition_key, key='Metric' + partition_key)
             self.producer.flush()
             future.get(timeout=60)
             print("message sent successfully...")
