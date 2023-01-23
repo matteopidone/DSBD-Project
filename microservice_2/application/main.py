@@ -1,7 +1,7 @@
 from connect_to_db import connect
 from time import sleep
 import json
-import consumer
+import MessageConsumer
 
 """ Main Function """
 def main():
