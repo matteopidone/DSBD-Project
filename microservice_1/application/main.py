@@ -74,7 +74,6 @@ for metricResultQuery in queryResult :
         if metricResultQuery['metric']['__name__'] == metric['name']:
             if( is_subset( metric['labels'], metricResultQuery['metric'] ) ):
                 #metriche desiderate
-                '''
                 t1 = Thread(target=calculate_stats_values, args=(metricResultQuery,))
                 t1.start()
                 t2 = Thread(target=calculate_prediction_values(metrics_list), args=(metricResultQuery,))
@@ -83,9 +82,5 @@ for metricResultQuery in queryResult :
                 t3.start()
                 t1.join()
                 t2.join()
-                t3.join()'''
-                calculate_metadata_values(metric)
-                calculate_prediction_values(metric)
-                calculate_stats_values(metric)
-                metrics_list.append(metricResultQuery)
+                t3.join()
                 break
