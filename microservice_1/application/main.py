@@ -6,11 +6,35 @@ import json
 from MessageProducer import MessageProducerClass
 from threading import Thread
 
+""" Main Function """
 
+def main():
+    # try and catch da inserire
+    file = open("../config.json")
+    data = json.load(file)
+    file.close()
 
-broker = "kafka:9092"
-topic = "prova"
-message_producer = MessageProducerClass(broker, topic)
+    metrics_list = list()
+    prom = PrometheusConnect(url="http://15.160.61.227:29090/", disable_ssl=True) # togliere l'url e metterlo in env
+    queryResult = prom.custom_query(query='{job="' + data['job'] +'"}[' + data['range_time'] +']')
+
+    for metricResultQuery in queryResult :
+        for metric in data['metrics']:
+            if metricResultQuery['metric']['__name__'] == metric['name']:
+                if( is_subset( metric['labels'], metricResultQuery['metric'] ) ):
+                    #metriche desiderate
+                    t1 = Thread(target=calculate_stats_values, args=(metricResultQuery,))
+                    t1.start()
+                    t2 = Thread(target=calculate_prediction_values(metrics_list), args=(metricResultQuery,))
+                    t2.start()
+                    t3 = Thread(target=calculate_metadata_values(metrics_list), args=(metricResultQuery,))
+                    t3.start()
+                    t1.join()
+                    t2.join()
+                    t3.join()
+                    break
+
+""" Functions """
 
 def is_subset(a, b):
     subset = {}
@@ -58,29 +82,10 @@ def calculate_prediction_values(metric, hours='1h'):
     print(resp)
     return resp
 
+""" Start Main Script """
 
-# try and catch da inserire
-
-file = open("../config.json")
-data = json.load(file)
-file.close()
-
-metrics_list = list()
-prom = PrometheusConnect(url="http://15.160.61.227:29090/", disable_ssl=True) # togliere l'url e metterlo in env
-queryResult = prom.custom_query(query='{job="' + data['job'] +'"}[' + data['range_time'] +']')
-
-for metricResultQuery in queryResult :
-    for metric in data['metrics']:
-        if metricResultQuery['metric']['__name__'] == metric['name']:
-            if( is_subset( metric['labels'], metricResultQuery['metric'] ) ):
-                #metriche desiderate
-                t1 = Thread(target=calculate_stats_values, args=(metricResultQuery,))
-                t1.start()
-                t2 = Thread(target=calculate_prediction_values(metrics_list), args=(metricResultQuery,))
-                t2.start()
-                t3 = Thread(target=calculate_metadata_values(metrics_list), args=(metricResultQuery,))
-                t3.start()
-                t1.join()
-                t2.join()
-                t3.join()
-                break
+if __name__ == '__main__':
+    broker = "kafka:9092"
+    topic = "prova"
+    message_producer = MessageProducerClass(broker, topic)
+    main()
