@@ -2,6 +2,9 @@ from flask import Flask, render_template
 import json
 from connect_to_db import connect, close
 import grpc
+import sys
+sys.path.append('./gRPCUtils')
+
 import echo_pb2
 import echo_pb2_grpc
 import ast

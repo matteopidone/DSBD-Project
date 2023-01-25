@@ -41,8 +41,9 @@ broker = 'kafka:9092'
 topic = 'prova'
 group_id = 'consumer-1'
 
-consumer1 = MessageConsumerClass(broker,topic,group_id)
-consumer1.activate_listener()
+def start_consumers() :
+    consumer1 = MessageConsumerClass(broker,topic,group_id)
+    consumer1.activate_listener()
 
-consumer2 = MessageConsumerClass(broker,topic,group_id)
-consumer2.activate_listener()
+    consumer2 = MessageConsumerClass(broker,topic,group_id)
+    consumer2.activate_listener()
