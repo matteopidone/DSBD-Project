@@ -12,5 +12,8 @@ RUN apt-get install vim -y
 
 RUN pip install --no-cache-dir mysql-connector-python
 RUN pip install --no-cache-dir kafka-python
+RUN pip install --no-cache-dir grpcio 
+RUN pip install --no-cache-dir grpcio-tools
+#verificare che gli ultimi due servono
 
 CMD ["python", "main.py"]

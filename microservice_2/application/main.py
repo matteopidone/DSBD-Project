@@ -1,20 +1,15 @@
 from connect_to_db import connect
 from time import sleep
 import json
-import MessageConsumer
+#import MessageConsumer
+from gRPCServer import serve
 
 """ Main Function """
 def main():
     database = connect()
     cursor = database.cursor()
     init_database(cursor)
-
-    while True:
-        cursor.execute("SHOW TABLES")
-        for x in cursor:
-            print(x)
-        print('Sleeping...')
-        sleep(10)
+    serve()
 
 """ Function to Initialize the Database """
 def init_database(cursor):
