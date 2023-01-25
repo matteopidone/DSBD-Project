@@ -7,24 +7,20 @@ from connect_to_db import connect
 class EchoService(echo_pb2_grpc.EchoServiceServicer):
 
     def getAllMetrics(self, request, context) :
-        '''
         database = connect()
         cursor = database.cursor()
         try:
             cursor.execute("SELECT * FROM statistiche")
             query_result = cursor.fetchall()
-            print('query result' + query_result)
             if query_result :
-                return echo_pb2.AllMetrics(idMetric=query_result[0], metricName=query_result[1])
+                return echo_pb2.AllMetrics(result=str(query_result).strip('[]'))
             else :
-                return echo_pb2.AllMetrics(idMetric='', metricName='')
+                return echo_pb2.AllMetrics(result=list())
         except :
             print("Error while execute the query")
         finally:
             cursor.close()
-            database.close()'''
-        l = [(1, 'pippo'), (2, 'pluto')]
-        return echo_pb2.AllMetrics(result=str(l).strip('[]'))
+            database.close()
 
 
 def serve():
