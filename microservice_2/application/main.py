@@ -11,7 +11,7 @@ def main():
     database = db_instance.connect()
     cursor = database.cursor()
     init_database(cursor)
-    p = Process(target=start_consumers)
+    p = Process(target=start_consumers, args=[DataStorageDatabaseClass()])
     p.start()
     serve()
 

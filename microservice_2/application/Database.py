@@ -23,4 +23,13 @@ class DataStorageDatabaseClass():
 
         return database
 
+    def insert_or_update_stats(self) :
+        return True
+    
+    def insert_or_update_prediction(self) :
+        return True
+
+    def insert_or_update_metadata(self) :
+        return True
+
 # Close connection to Database
