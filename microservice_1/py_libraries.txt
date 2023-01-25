@@ -1,2 +1,3 @@
 prometheus-api-client
 kafka-python
+statsmodels

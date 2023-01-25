@@ -1,5 +1,6 @@
 from prometheus_api_client import PrometheusConnect, MetricRangeDataFrame
 from prometheus_api_client.utils import parse_datetime
+from statsmodels.tsa.holtwinters import ExponentialSmoothing
 from MessageProducer import MessageProducerClass
 from threading import Thread
 from datetime import timedelta
@@ -42,9 +43,23 @@ def main():
     while True:
         for metric in data['metrics']:
             for time in time_list:
-                thread_stats = Thread(target=calculate_stats_values, args=(prom, metric, time))
+                
+                start_time = parse_datetime(time)
+                end_time = parse_datetime("now")
+                chunk_size = timedelta(minutes=5)
+
+                metric_data = prom.get_metric_range_data(
+                    metric_name=metric['name'],
+                    label_config=metric['labels'],
+                    start_time=start_time,
+                    end_time=end_time,
+                    chunk_size=chunk_size,
+                )
+                metric_dataframe = MetricRangeDataFrame(metric_data)
+
+                thread_stats = Thread(target=calculate_stats_values, args=(metric, metric_dataframe, time))
                 thread_stats.start()
-                thread_prediction = Thread(target=calculate_prediction_values, args=(prom, metric, time))
+                thread_prediction = Thread(target=calculate_prediction_values, args=(metric, metric_dataframe))
                 thread_prediction.start()
 
         sleep(sleep_time)
@@ -68,24 +83,12 @@ def calculate_metadata_values(metric_info, values):
         'stazionarieta': 4,
         'stagionalita': 8
     }
-    resp = message_producer.send_msg(data)
+
+    message_producer.send_msg(data)
 
 """ Statistics calculus """
-def calculate_stats_values(prom, metric, time):
+def calculate_stats_values(metric, metric_dataframe, time):
 
-    start_time = parse_datetime(time)
-    end_time = parse_datetime("now")
-    chunk_size = timedelta(minutes=5)
-
-    metric_data = prom.get_metric_range_data(
-        metric_name=metric['name'],
-        label_config=metric['labels'],
-        start_time=start_time,
-        end_time=end_time,
-        chunk_size=chunk_size,
-    )
-
-    metric_dataframe = MetricRangeDataFrame(metric_data)
     max = round(metric_dataframe['value'].max())
     min = round(metric_dataframe['value'].min())
     avg = round(metric_dataframe['value'].mean())
@@ -103,19 +106,36 @@ def calculate_stats_values(prom, metric, time):
         }
     }
 
-    resp = message_producer.send_msg(data)
+    message_producer.send_msg(data)
 
 """ Predictions calculus """
-def calculate_prediction_values(prom, metric, time):
-    #Calcoli
-    #Record Key Prediction#indice_metrica
+def calculate_prediction_values(metric, metric_dataframe):
+
+    resampled_data = metric_dataframe['value'].resample(rule='1T')
+
+    avg = resampled_data.mean()
+    max = resampled_data.max()
+    min = resampled_data.min()
+
+    prediction_max = ExponentialSmoothing(max, trend='add', seasonal='add',seasonal_periods=4).fit()
+    prediction_min = ExponentialSmoothing(min, trend='add', seasonal='add',seasonal_periods=4).fit()
+    prediction_avg = ExponentialSmoothing(avg, trend='add', seasonal='add',seasonal_periods=4).fit() 
+
+    result_max = prediction_max.forecast(10)
+    result_min = prediction_min.forecast(10)
+    result_avg = prediction_avg.forecast(10)
+
     data = {
-        'name': 'pippo',
-        'max': 10,
-        'min': 1,
-        'avg': 7,
+        'name': metric['name'],
+        'type': 'predictions',
+        'values': {
+            'max': max,
+            'min': min,
+            'avg': avg
+        }
     }
-    resp = message_producer.send_msg(data)
+
+    message_producer.send_msg(data)
 
 """ Start Main Script """
 
