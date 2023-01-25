@@ -28,16 +28,16 @@ class MessageConsumerClass:
         try:
             for message in consumer:
                 message_received = message.value
-                print("received message = ", message.value)
-                value = False
+                #print("received message = ", message.value)
+                value = 'Pippo value'
                 if message_received['type'] == 'statistics' :
-                    value = self.db_instance.insert_or_update_stats()
+                    value = self.db_instance.insert_or_update_stats(metric_name = message_received['type'], value = message_received['value'])
 
                 elif message_received['type'] == 'prediction' :
-                    value = self.db_instance.insert_or_update_prediction()
+                    value = self.db_instance.insert_or_update_prediction(metric_name = message_received['type'], value = message_received['value'])
 
                 elif message_received['type'] == 'metadata' :
-                    value = self.db_instance.insert_or_update_metadata()          
+                    value = self.db_instance.insert_or_update_metadata(metric_name = message_received['type'], value = message_received['value'])          
                 print("Value " + str(value))
                 consumer.commit()
         except KeyboardInterrupt:

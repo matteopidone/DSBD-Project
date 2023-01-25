@@ -23,13 +23,56 @@ class DataStorageDatabaseClass():
 
         return database
 
-    def insert_or_update_stats(self) :
-        return True
+    def insert_or_update_stats(self, metric_name, value) :
+        db = self.connect()
+        cursor = db.cursor()
+        try :
+            cursor.execute()
+            query_result = cursor.fetchone()
+            if query_result :
+                return True
+            else :
+                return False
+        except :
+            print("Error while execute the query")
+            return False
+        finally:
+            cursor.close()
+            db.close()
     
-    def insert_or_update_prediction(self) :
-        return True
+    def insert_or_update_prediction(self, metric_name, value) :
+        db = self.connect()
+        cursor = db.cursor()
+        try :
+            cursor.execute()
+            query_result = cursor.fetchone()
+            if query_result :
+                return True
+            else :
+                return False
+        except :
+            print("Error while execute the query")
+            return False
+            
+        finally:
+            cursor.close()
+            db.close()
 
-    def insert_or_update_metadata(self) :
-        return True
+    def insert_or_update_metadata(self, metric_name, value) :
+        db = self.connect()
+        cursor = db.cursor()
+        try :
+            cursor.execute()
+            query_result = cursor.fetchone()
+            if query_result :
+                return True
+            else :
+                return False
+        except :
+            print("Error while execute the query")
+            return False
+        finally:
+            cursor.close()
+            db.close()
 
 # Close connection to Database
