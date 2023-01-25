@@ -26,7 +26,11 @@ class MessageConsumerClass:
         print("consumer is listening....")
         try:
             for message in consumer:
-                print("received message = ", message)
+                print("received message = ", message.value)
+                '''
+                message_received = message.value
+                if(message_received.type == 'statistics')
+                '''                    
 
                 #committing message manually after reading from the topic
                 consumer.commit()

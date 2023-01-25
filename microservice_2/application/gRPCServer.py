@@ -4,12 +4,13 @@ sys.path.append('./gRPCUtils')
 import echo_pb2
 import echo_pb2_grpc
 from concurrent import futures
-from connect_to_db import connect
+from Database import DataStorageDatabaseClass
 
 class EchoService(echo_pb2_grpc.EchoServiceServicer):
 
     def getAllMetrics(self, request, context) :
-        database = connect()
+        db_instance = DataStorageDatabaseClass()
+        database = db_instance.connect()
         cursor = database.cursor()
         try:
             cursor.execute("SELECT * FROM metriche")
@@ -25,7 +26,8 @@ class EchoService(echo_pb2_grpc.EchoServiceServicer):
             database.close()
     
     def getMetadataForMetrics(self, request, context) :
-        database = connect()
+        db_instance = DataStorageDatabaseClass()
+        database = db_instance.connect()
         cursor = database.cursor()
         try :
             cursor.execute("Select nome, metadata FROM metriche WHERE id = %s LIMIT 1", (request.idMetric,))
@@ -41,7 +43,8 @@ class EchoService(echo_pb2_grpc.EchoServiceServicer):
             database.close()
 
     def getHistoryForMetrics(self, request, context) :
-        database = connect()
+        db_instance = DataStorageDatabaseClass()
+        database = db_instance.connect()
         cursor = database.cursor()
         try:
             cursor.execute("SELECT metriche.nome, statistiche.nome, statistiche_metriche.1h, statistiche_metriche.3h, statistiche_metriche.12h FROM metriche JOIN statistiche_metriche ON metriche.id=statistiche_metriche.id_metrica JOIN statistiche on statistiche.id=statistiche_metriche.id_statistica WHERE metriche.id= %s", (request.idMetric,))
