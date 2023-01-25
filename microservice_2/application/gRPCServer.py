@@ -21,6 +21,22 @@ class EchoService(echo_pb2_grpc.EchoServiceServicer):
         finally:
             cursor.close()
             database.close()
+    
+    def getMetadataForMetrics(self, request, context) :
+        database = connect()
+        cursor = database.cursor()
+        try :
+            cursor.execute("Select nome, metadata FROM metriche WHERE id = %s LIMIT 1", (request.idMetric,))
+            query_result = cursor.fetchone()
+            if query_result :
+                return  echo_pb2.AllMetrics(result=str(query_result).strip('[]'))
+            else :
+                return echo_pb2.AllMetrics(result=str())
+        except :
+            print("Error while execute the query", e)
+        finally:
+            cursor.close()
+            database.close()
 
 
 def serve():

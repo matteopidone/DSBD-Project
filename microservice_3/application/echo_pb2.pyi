@@ -13,3 +13,9 @@ class AllMetrics(_message.Message):
 class getAllMetricsParams(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
+
+class getMetadataForMetricsParams(_message.Message):
+    __slots__ = ["idMetric"]
+    IDMETRIC_FIELD_NUMBER: _ClassVar[int]
+    idMetric: str
+    def __init__(self, idMetric: _Optional[str] = ...) -> None: ...
