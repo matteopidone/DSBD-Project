@@ -1,7 +1,7 @@
 from connect_to_db import connect
 from time import sleep
 import json
-#import MessageConsumer
+import MessageConsumer
 from gRPCServer import serve
 
 """ Main Function """
