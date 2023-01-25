@@ -21,6 +21,9 @@ services:
     restart: always
     environment:
       PROMETHEUS_SERVER: http://15.160.61.227:29090
+      INTERVAL_TIME_SECONDS: 600
+      KAFKA_BROKER: kafka:9092
+      KAFKA_TOPIC: prometheusdata
 
   microservice_2:
     image: data_storage
