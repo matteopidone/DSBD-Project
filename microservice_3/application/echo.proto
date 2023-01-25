@@ -5,6 +5,7 @@ package echo;
 service EchoService {
   rpc getAllMetrics (getAllMetricsParams) returns (AllMetrics) {}
   rpc getMetadataForMetrics (getMetadataForMetricsParams) returns (AllMetrics) {}
+  rpc getHistoryForMetrics (getMetadataForMetricsParams) returns (AllMetrics) {}
 }
 
 message getMetadataForMetricsParams {
