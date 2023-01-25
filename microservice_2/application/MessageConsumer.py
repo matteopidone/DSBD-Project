@@ -8,10 +8,11 @@ class MessageConsumerClass:
     group_id = ""
     logger = None
 
-    def __init__(self, broker, topic, group_id):
+    def __init__(self, broker, topic, group_id, db_instance):
         self.broker = broker
         self.topic = topic
         self.group_id = group_id
+        self.db_instance = db_instance
 
     def activate_listener(self):
         consumer = KafkaConsumer(bootstrap_servers=self.broker,
@@ -26,13 +27,18 @@ class MessageConsumerClass:
         print("consumer is listening....")
         try:
             for message in consumer:
-                print("received message = ", message.value)
-                '''
                 message_received = message.value
-                if(message_received.type == 'statistics')
-                '''                    
+                print("received message = ", message.value)
+                value = False
+                if message_received['type'] == 'statistics' :
+                    value = self.db_instance.insert_or_update_stats()
 
-                #committing message manually after reading from the topic
+                elif message_received['type'] == 'prediction' :
+                    value = self.db_instance.insert_or_update_prediction()
+
+                elif message_received['type'] == 'metadata' :
+                    value = self.db_instance.insert_or_update_metadata()          
+                print("Value " + str(value))
                 consumer.commit()
         except KeyboardInterrupt:
             print("Aborted by user...")
@@ -45,9 +51,9 @@ broker = 'kafka:9092'
 topic = 'prova'
 group_id = 'consumer-1'
 
-def start_consumers() :
-    consumer1 = MessageConsumerClass(broker,topic,group_id)
+def start_consumers(db) :
+    consumer1 = MessageConsumerClass(broker, topic, group_id, db)
     consumer1.activate_listener()
 
-    consumer2 = MessageConsumerClass(broker,topic,group_id)
+    consumer2 = MessageConsumerClass(broker, topic, group_id, db)
     consumer2.activate_listener()
