@@ -15,7 +15,7 @@ class EchoService(echo_pb2_grpc.EchoServiceServicer):
             if query_result :
                 return echo_pb2.AllMetrics(result=str(query_result).strip('[]'))
             else :
-                return echo_pb2.AllMetrics(result=list())
+                return echo_pb2.AllMetrics(result=str())
         except :
             print("Error while execute the query")
         finally:
