@@ -10,7 +10,7 @@ class EchoService(echo_pb2_grpc.EchoServiceServicer):
         database = connect()
         cursor = database.cursor()
         try:
-            cursor.execute("SELECT * FROM statistiche")
+            cursor.execute("SELECT * FROM metriche")
             query_result = cursor.fetchall()
             if query_result :
                 return echo_pb2.resultValue(result=str(query_result).strip('[]'))
