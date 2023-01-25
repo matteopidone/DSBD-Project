@@ -7,6 +7,8 @@ COPY application/ ./
 RUN apt-get update
 RUN apt-get upgrade -y
 RUN apt-get install vim -y
+RUN pip install --no-cache-dir grpcio 
+RUN pip install --no-cache-dir grpcio-tools
 # End
 
 RUN pip install --no-cache-dir Flask mysql-connector-python

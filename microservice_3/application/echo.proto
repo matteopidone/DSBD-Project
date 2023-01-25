@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package echo;
+
+service EchoService {
+  rpc getAllMetrics (getAllMetricsParams) returns (AllMetrics) {}
+}
+
+message getAllMetricsParams {}
+
+message AllMetrics {
+  string result = 1;
+}
