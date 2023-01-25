@@ -1,4 +1,6 @@
 import grpc
+import sys
+sys.path.append('./gRPCUtils')
 import echo_pb2
 import echo_pb2_grpc
 from concurrent import futures

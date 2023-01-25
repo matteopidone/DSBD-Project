@@ -1,7 +1,8 @@
 from connect_to_db import connect
 from time import sleep
 import json
-import MessageConsumer
+from multiprocessing import Process
+from MessageConsumer import start_consumers 
 from gRPCServer import serve
 
 """ Main Function """
@@ -9,6 +10,8 @@ def main():
     database = connect()
     cursor = database.cursor()
     init_database(cursor)
+    p = Process(target=start_consumers)
+    p.start()
     serve()
 
 """ Function to Initialize the Database """
