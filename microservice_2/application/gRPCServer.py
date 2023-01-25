@@ -10,54 +10,18 @@ class EchoService(echo_pb2_grpc.EchoServiceServicer):
 
     def getAllMetrics(self, request, context) :
         db_instance = DataStorageDatabaseClass()
-        database = db_instance.connect()
-        cursor = database.cursor()
-        try:
-            cursor.execute("SELECT * FROM metriche")
-            query_result = cursor.fetchall()
-            if query_result :
-                return echo_pb2.resultValue(result=str(query_result).strip('[]'))
-            else :
-                return echo_pb2.resultValue(result=str())
-        except :
-            print("Error while execute the query")
-        finally:
-            cursor.close()
-            database.close()
+        result = db_instance.get_all_metrics()
+        return echo_pb2.resultValue(result=result)
     
     def getMetadataForMetrics(self, request, context) :
         db_instance = DataStorageDatabaseClass()
-        database = db_instance.connect()
-        cursor = database.cursor()
-        try :
-            cursor.execute("Select nome, metadata FROM metriche WHERE id = %s LIMIT 1", (request.idMetric,))
-            query_result = cursor.fetchone()
-            if query_result :
-                return  echo_pb2.resultValue(result=str(query_result).strip('[]'))
-            else :
-                return echo_pb2.resultValue(result=str())
-        except :
-            print("Error while execute the query", e)
-        finally:
-            cursor.close()
-            database.close()
+        result = db_instance.get_metadata_for_metrics(id_metric=request.idMetric)
+        return echo_pb2.resultValue(result=result)
 
     def getHistoryForMetrics(self, request, context) :
         db_instance = DataStorageDatabaseClass()
-        database = db_instance.connect()
-        cursor = database.cursor()
-        try:
-            cursor.execute("SELECT metriche.nome, statistiche.nome, statistiche_metriche.1h, statistiche_metriche.3h, statistiche_metriche.12h FROM metriche JOIN statistiche_metriche ON metriche.id=statistiche_metriche.id_metrica JOIN statistiche on statistiche.id=statistiche_metriche.id_statistica WHERE metriche.id= %s", (request.idMetric,))
-            query_result = cursor.fetchall()
-            if query_result :
-                return  echo_pb2.resultValue(result=str(query_result).strip('[]'))
-            else :
-                return echo_pb2.resultValue(result=str())
-        except :
-            print("Error while execute the query")
-        finally:
-            cursor.close()
-            database.close()
+        result = db_instance.get_history_for_metrics(id_metric=request.idMetric)
+        return echo_pb2.resultValue(result=result)
 
 
 def serve():
