@@ -1,4 +1,4 @@
-from connect_to_db import connect
+from Database import DataStorageDatabaseClass
 from time import sleep
 import json
 from multiprocessing import Process
@@ -7,7 +7,8 @@ from gRPCServer import serve
 
 """ Main Function """
 def main():
-    database = connect()
+    db_instance = DataStorageDatabaseClass()
+    database = db_instance.connect()
     cursor = database.cursor()
     init_database(cursor)
     p = Process(target=start_consumers)
