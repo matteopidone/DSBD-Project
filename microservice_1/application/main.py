@@ -1,6 +1,8 @@
-from prometheus_api_client import PrometheusConnect
+from prometheus_api_client import PrometheusConnect, MetricRangeDataFrame
+from prometheus_api_client.utils import parse_datetime
 from MessageProducer import MessageProducerClass
 from threading import Thread
+from datetime import timedelta
 from time import sleep
 import json
 import os
@@ -26,30 +28,24 @@ def main():
         for metric in data['metrics']:
             if metricResultQuery['metric']['__name__'] == metric['name']:
                 if is_subset( metric['labels'], metricResultQuery['metric']):
-                    t0 = Thread(target=calculate_metadata_values, args=(metricResultQuery['metric'], metricResultQuery['values']))
-                    t0.start()
+                    thread_metadata = Thread(target=calculate_metadata_values, args=(metricResultQuery['metric'], metricResultQuery['values']))
+                    thread_metadata.start()
                     break
 
     sleep_time = 600
     if os.environ.get('INTERVAL_TIME_SECONDS'):
         sleep_time = os.environ['INTERVAL_TIME_SECONDS']
 
+    time_list = ['1h', '3h', '12h']
+
     """ Start statistics and predictions calculus """
     while True:
         for metric in data['metrics']:
-
-            t1 = Thread(target=calculate_stats_values, args=(prom, metric, '1h'))
-            t2 = Thread(target=calculate_stats_values, args=(prom, metric, '3h'))
-            t3 = Thread(target=calculate_stats_values, args=(prom, metric, '12h'))
-            t1.start()
-            t2.start()
-            t3.start()
-            t4 = Thread(target=calculate_prediction_values, args=(prom, metric, '1h'))
-            t5 = Thread(target=calculate_prediction_values, args=(prom, metric, '3h'))
-            t6 = Thread(target=calculate_prediction_values, args=(prom, metric, '12h'))
-            t4.start()
-            t5.start()
-            t6.start()
+            for time in time_list:
+                thread_stats = Thread(target=calculate_stats_values, args=(prom, metric, time))
+                thread_stats.start()
+                thread_prediction = Thread(target=calculate_prediction_values, args=(prom, metric, time))
+                thread_prediction.start()
 
         sleep(sleep_time)
 
@@ -65,10 +61,9 @@ def is_subset(a, b):
 """ Metadata calculus """
 def calculate_metadata_values(metric_info, values):
 
-
-
     data = {
         'name': 'pippo',
+        #labels
         'autocorrelazione': 1,
         'stazionarieta': 4,
         'stagionalita': 8
@@ -76,39 +71,42 @@ def calculate_metadata_values(metric_info, values):
     resp = message_producer.send_msg(data)
 
 """ Statistics calculus """
-def calculate_stats_values(prom, metric, hours='1h'):
-    print('inside calculate_stats_values')
-    print(metric)
-    
-    #queryResult = prom.custom_query(query='{job="' + data['job'] +'"}[' + data['range_time'] +']')
+def calculate_stats_values(prom, metric, time):
 
+    start_time = parse_datetime(time)
+    end_time = parse_datetime("now")
+    chunk_size = timedelta(minutes=5)
 
+    metric_data = prom.get_metric_range_data(
+        metric_name=metric['name'],
+        label_config=metric['labels'],
+        start_time=start_time,
+        end_time=end_time,
+        chunk_size=chunk_size,
+    )
 
-    max = min = avg = dev_std = sum = n = 0
+    metric_dataframe = MetricRangeDataFrame(metric_data)
+    max = round(metric_dataframe['value'].max())
+    min = round(metric_dataframe['value'].min())
+    avg = round(metric_dataframe['value'].mean())
+    dev_std = round(metric_dataframe['value'].std())
 
-    for timestamp, value in metric:
-        if value > max:
-            max = value
-        elif value < min:
-            min = value
-        sum += value
-        n += 1
-
-    avg = sum/n
-
-    #Calcoli
-    #Record Key Stats#indice_metrica
     data = {
-        'name': 'pippo',
-        'max': 10,
-        'min': 1,
-        'avg': 7,
-        'dev_std': 2
+        'name': metric['name'],
+        'type': 'statistics',
+        'values': {
+            'time': time,
+            'max': max,
+            'min': min,
+            'avg': avg,
+            'dev_std': dev_std
+        }
     }
+
     resp = message_producer.send_msg(data)
 
 """ Predictions calculus """
-def calculate_prediction_values(prom, metric, hours='1h'):
+def calculate_prediction_values(prom, metric, time):
     #Calcoli
     #Record Key Prediction#indice_metrica
     data = {
