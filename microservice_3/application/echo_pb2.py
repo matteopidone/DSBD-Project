@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\necho.proto\x12\x04\x65\x63ho\"/\n\x1bgetMetadataForMetricsParams\x12\x10\n\x08idMetric\x18\x01 \x01(\t\"\x15\n\x13getAllMetricsParams\"\x1c\n\nAllMetrics\x12\x0e\n\x06result\x18\x01 \x01(\t2\x9d\x01\n\x0b\x45\x63hoService\x12>\n\rgetAllMetrics\x12\x19.echo.getAllMetricsParams\x1a\x10.echo.AllMetrics\"\x00\x12N\n\x15getMetadataForMetrics\x12!.echo.getMetadataForMetricsParams\x1a\x10.echo.AllMetrics\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\necho.proto\x12\x04\x65\x63ho\"/\n\x1bgetMetadataForMetricsParams\x12\x10\n\x08idMetric\x18\x01 \x01(\t\"\x15\n\x13getAllMetricsParams\"\x1c\n\nAllMetrics\x12\x0e\n\x06result\x18\x01 \x01(\t2\xec\x01\n\x0b\x45\x63hoService\x12>\n\rgetAllMetrics\x12\x19.echo.getAllMetricsParams\x1a\x10.echo.AllMetrics\"\x00\x12N\n\x15getMetadataForMetrics\x12!.echo.getMetadataForMetricsParams\x1a\x10.echo.AllMetrics\"\x00\x12M\n\x14getHistoryForMetrics\x12!.echo.getMetadataForMetricsParams\x1a\x10.echo.AllMetrics\"\x00\x62\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'echo_pb2', globals())
@@ -27,5 +27,5 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _ALLMETRICS._serialized_start=92
   _ALLMETRICS._serialized_end=120
   _ECHOSERVICE._serialized_start=123
-  _ECHOSERVICE._serialized_end=280
+  _ECHOSERVICE._serialized_end=359
 # @@protoc_insertion_point(module_scope)

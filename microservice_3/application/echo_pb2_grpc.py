@@ -24,6 +24,11 @@ class EchoServiceStub(object):
                 request_serializer=echo__pb2.getMetadataForMetricsParams.SerializeToString,
                 response_deserializer=echo__pb2.AllMetrics.FromString,
                 )
+        self.getHistoryForMetrics = channel.unary_unary(
+                '/echo.EchoService/getHistoryForMetrics',
+                request_serializer=echo__pb2.getMetadataForMetricsParams.SerializeToString,
+                response_deserializer=echo__pb2.AllMetrics.FromString,
+                )
 
 
 class EchoServiceServicer(object):
@@ -41,6 +46,12 @@ class EchoServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def getHistoryForMetrics(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_EchoServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -51,6 +62,11 @@ def add_EchoServiceServicer_to_server(servicer, server):
             ),
             'getMetadataForMetrics': grpc.unary_unary_rpc_method_handler(
                     servicer.getMetadataForMetrics,
+                    request_deserializer=echo__pb2.getMetadataForMetricsParams.FromString,
+                    response_serializer=echo__pb2.AllMetrics.SerializeToString,
+            ),
+            'getHistoryForMetrics': grpc.unary_unary_rpc_method_handler(
+                    servicer.getHistoryForMetrics,
                     request_deserializer=echo__pb2.getMetadataForMetricsParams.FromString,
                     response_serializer=echo__pb2.AllMetrics.SerializeToString,
             ),
@@ -93,6 +109,23 @@ class EchoService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/echo.EchoService/getMetadataForMetrics',
+            echo__pb2.getMetadataForMetricsParams.SerializeToString,
+            echo__pb2.AllMetrics.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def getHistoryForMetrics(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/echo.EchoService/getHistoryForMetrics',
             echo__pb2.getMetadataForMetricsParams.SerializeToString,
             echo__pb2.AllMetrics.FromString,
             options, channel_credentials,

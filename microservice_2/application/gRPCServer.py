@@ -38,6 +38,22 @@ class EchoService(echo_pb2_grpc.EchoServiceServicer):
             cursor.close()
             database.close()
 
+    def getHistoryForMetrics(self, request, context) :
+        database = connect()
+        cursor = database.cursor()
+        try:
+            cursor.execute("SELECT metriche.nome, statistiche.nome, statistiche_metriche.1h, statistiche_metriche.3h, statistiche_metriche.12h FROM metriche JOIN statistiche_metriche ON metriche.id=statistiche_metriche.id_metrica JOIN statistiche on statistiche.id=statistiche_metriche.id_statistica WHERE metriche.id= %s", (request.idMetric,))
+            query_result = cursor.fetchall()
+            if query_result :
+                return  echo_pb2.AllMetrics(result=str(query_result).strip('[]'))
+            else :
+                return echo_pb2.AllMetrics(result=str())
+        except :
+            print("Error while execute the query")
+        finally:
+            cursor.close()
+            database.close()
+
 
 def serve():
     port = '50051'
