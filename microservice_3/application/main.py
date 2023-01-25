@@ -1,6 +1,10 @@
 from flask import Flask, render_template
 import json
 from connect_to_db import connect, close
+import grpc
+import echo_pb2
+import echo_pb2_grpc
+import ast
 
 app = Flask(__name__)
 
@@ -10,20 +14,11 @@ def hello_world():
 
 @app.route("/getAllMetrics")
 def test():
-    database = connect()
-    cursor = database.cursor()
-    try:
-        cursor.execute("SELECT * FROM statistiche")
-        query_result = cursor.fetchall()
-        if query_result :
-            return render_template('metrics.html', results=query_result)
-        else :
-            return "<p>Nessuna Metrica al momento è disponibile</p>"
-    except Error as e:
-        print("Error while execute the query", e)
-    finally:
-        cursor.close()
-        close(database)
+    with grpc.insecure_channel('microservice_2:50051') as channel:
+        stub = echo_pb2_grpc.EchoServiceStub(channel)
+        result = stub.getAllMetrics(echo_pb2.getAllMetricsParams())
+        print(list(ast.literal_eval(result.result)))
+        return render_template('metrics.html', results=list(ast.literal_eval(result.result)))
 
 @app.route("/<id_metric>/metadata/")
 def get_metadata_for_metrics(id_metric):
