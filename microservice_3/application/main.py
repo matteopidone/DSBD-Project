@@ -16,9 +16,12 @@ def hello_world():
 def test():
     with grpc.insecure_channel('microservice_2:50051') as channel:
         stub = echo_pb2_grpc.EchoServiceStub(channel)
-        result = stub.getAllMetrics(echo_pb2.getAllMetricsParams())
-        print(list(ast.literal_eval(result.result)))
-        return render_template('metrics.html', results=list(ast.literal_eval(result.result)))
+        query_result = stub.getAllMetrics(echo_pb2.getAllMetricsParams())
+        if len(query_result.result) != 0 :
+            query_result_list = list(ast.literal_eval(query_result.result))
+            return render_template('metrics.html', results=query_result_list)
+        else :
+            return "<p>Nessuna Metrica al momento è disponibile</p>"
 
 @app.route("/<id_metric>/metadata/")
 def get_metadata_for_metrics(id_metric):
