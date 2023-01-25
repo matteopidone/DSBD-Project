@@ -16,18 +16,18 @@ class EchoServiceStub(object):
         """
         self.getAllMetrics = channel.unary_unary(
                 '/echo.EchoService/getAllMetrics',
-                request_serializer=echo__pb2.getAllMetricsParams.SerializeToString,
-                response_deserializer=echo__pb2.AllMetrics.FromString,
+                request_serializer=echo__pb2.emptyParam.SerializeToString,
+                response_deserializer=echo__pb2.resultValue.FromString,
                 )
         self.getMetadataForMetrics = channel.unary_unary(
                 '/echo.EchoService/getMetadataForMetrics',
-                request_serializer=echo__pb2.getMetadataForMetricsParams.SerializeToString,
-                response_deserializer=echo__pb2.AllMetrics.FromString,
+                request_serializer=echo__pb2.idMetricParam.SerializeToString,
+                response_deserializer=echo__pb2.resultValue.FromString,
                 )
         self.getHistoryForMetrics = channel.unary_unary(
                 '/echo.EchoService/getHistoryForMetrics',
-                request_serializer=echo__pb2.getMetadataForMetricsParams.SerializeToString,
-                response_deserializer=echo__pb2.AllMetrics.FromString,
+                request_serializer=echo__pb2.idMetricParam.SerializeToString,
+                response_deserializer=echo__pb2.resultValue.FromString,
                 )
 
 
@@ -57,18 +57,18 @@ def add_EchoServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'getAllMetrics': grpc.unary_unary_rpc_method_handler(
                     servicer.getAllMetrics,
-                    request_deserializer=echo__pb2.getAllMetricsParams.FromString,
-                    response_serializer=echo__pb2.AllMetrics.SerializeToString,
+                    request_deserializer=echo__pb2.emptyParam.FromString,
+                    response_serializer=echo__pb2.resultValue.SerializeToString,
             ),
             'getMetadataForMetrics': grpc.unary_unary_rpc_method_handler(
                     servicer.getMetadataForMetrics,
-                    request_deserializer=echo__pb2.getMetadataForMetricsParams.FromString,
-                    response_serializer=echo__pb2.AllMetrics.SerializeToString,
+                    request_deserializer=echo__pb2.idMetricParam.FromString,
+                    response_serializer=echo__pb2.resultValue.SerializeToString,
             ),
             'getHistoryForMetrics': grpc.unary_unary_rpc_method_handler(
                     servicer.getHistoryForMetrics,
-                    request_deserializer=echo__pb2.getMetadataForMetricsParams.FromString,
-                    response_serializer=echo__pb2.AllMetrics.SerializeToString,
+                    request_deserializer=echo__pb2.idMetricParam.FromString,
+                    response_serializer=echo__pb2.resultValue.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -92,8 +92,8 @@ class EchoService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/echo.EchoService/getAllMetrics',
-            echo__pb2.getAllMetricsParams.SerializeToString,
-            echo__pb2.AllMetrics.FromString,
+            echo__pb2.emptyParam.SerializeToString,
+            echo__pb2.resultValue.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -109,8 +109,8 @@ class EchoService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/echo.EchoService/getMetadataForMetrics',
-            echo__pb2.getMetadataForMetricsParams.SerializeToString,
-            echo__pb2.AllMetrics.FromString,
+            echo__pb2.idMetricParam.SerializeToString,
+            echo__pb2.resultValue.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -126,7 +126,7 @@ class EchoService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/echo.EchoService/getHistoryForMetrics',
-            echo__pb2.getMetadataForMetricsParams.SerializeToString,
-            echo__pb2.AllMetrics.FromString,
+            echo__pb2.idMetricParam.SerializeToString,
+            echo__pb2.resultValue.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

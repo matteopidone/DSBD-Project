@@ -3,17 +3,17 @@ syntax = "proto3";
 package echo;
 
 service EchoService {
-  rpc getAllMetrics (getAllMetricsParams) returns (AllMetrics) {}
-  rpc getMetadataForMetrics (getMetadataForMetricsParams) returns (AllMetrics) {}
-  rpc getHistoryForMetrics (getMetadataForMetricsParams) returns (AllMetrics) {}
+  rpc getAllMetrics (emptyParam) returns (resultValue) {}
+  rpc getMetadataForMetrics (idMetricParam) returns (resultValue) {}
+  rpc getHistoryForMetrics (idMetricParam) returns (resultValue) {}
 }
 
-message getMetadataForMetricsParams {
+message idMetricParam {
   string idMetric = 1;
 }
 
-message getAllMetricsParams {}
+message emptyParam {}
 
-message AllMetrics {
+message resultValue {
   string result = 1;
 }

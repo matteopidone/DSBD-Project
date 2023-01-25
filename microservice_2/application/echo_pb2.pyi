@@ -4,18 +4,18 @@ from typing import ClassVar as _ClassVar, Optional as _Optional
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
-class AllMetrics(_message.Message):
-    __slots__ = ["result"]
-    RESULT_FIELD_NUMBER: _ClassVar[int]
-    result: str
-    def __init__(self, result: _Optional[str] = ...) -> None: ...
-
-class getAllMetricsParams(_message.Message):
+class emptyParam(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
 
-class getMetadataForMetricsParams(_message.Message):
+class idMetricParam(_message.Message):
     __slots__ = ["idMetric"]
     IDMETRIC_FIELD_NUMBER: _ClassVar[int]
     idMetric: str
     def __init__(self, idMetric: _Optional[str] = ...) -> None: ...
+
+class resultValue(_message.Message):
+    __slots__ = ["result"]
+    RESULT_FIELD_NUMBER: _ClassVar[int]
+    result: str
+    def __init__(self, result: _Optional[str] = ...) -> None: ...

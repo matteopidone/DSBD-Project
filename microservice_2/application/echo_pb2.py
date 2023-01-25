@@ -13,19 +13,19 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\necho.proto\x12\x04\x65\x63ho\"/\n\x1bgetMetadataForMetricsParams\x12\x10\n\x08idMetric\x18\x01 \x01(\t\"\x15\n\x13getAllMetricsParams\"\x1c\n\nAllMetrics\x12\x0e\n\x06result\x18\x01 \x01(\t2\xec\x01\n\x0b\x45\x63hoService\x12>\n\rgetAllMetrics\x12\x19.echo.getAllMetricsParams\x1a\x10.echo.AllMetrics\"\x00\x12N\n\x15getMetadataForMetrics\x12!.echo.getMetadataForMetricsParams\x1a\x10.echo.AllMetrics\"\x00\x12M\n\x14getHistoryForMetrics\x12!.echo.getMetadataForMetricsParams\x1a\x10.echo.AllMetrics\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\necho.proto\x12\x04\x65\x63ho\"!\n\ridMetricParam\x12\x10\n\x08idMetric\x18\x01 \x01(\t\"\x0c\n\nemptyParam\"\x1d\n\x0bresultValue\x12\x0e\n\x06result\x18\x01 \x01(\t2\xca\x01\n\x0b\x45\x63hoService\x12\x36\n\rgetAllMetrics\x12\x10.echo.emptyParam\x1a\x11.echo.resultValue\"\x00\x12\x41\n\x15getMetadataForMetrics\x12\x13.echo.idMetricParam\x1a\x11.echo.resultValue\"\x00\x12@\n\x14getHistoryForMetrics\x12\x13.echo.idMetricParam\x1a\x11.echo.resultValue\"\x00\x62\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'echo_pb2', globals())
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
-  _GETMETADATAFORMETRICSPARAMS._serialized_start=20
-  _GETMETADATAFORMETRICSPARAMS._serialized_end=67
-  _GETALLMETRICSPARAMS._serialized_start=69
-  _GETALLMETRICSPARAMS._serialized_end=90
-  _ALLMETRICS._serialized_start=92
-  _ALLMETRICS._serialized_end=120
-  _ECHOSERVICE._serialized_start=123
-  _ECHOSERVICE._serialized_end=359
+  _IDMETRICPARAM._serialized_start=20
+  _IDMETRICPARAM._serialized_end=53
+  _EMPTYPARAM._serialized_start=55
+  _EMPTYPARAM._serialized_end=67
+  _RESULTVALUE._serialized_start=69
+  _RESULTVALUE._serialized_end=98
+  _ECHOSERVICE._serialized_start=101
+  _ECHOSERVICE._serialized_end=303
 # @@protoc_insertion_point(module_scope)
