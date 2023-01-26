@@ -46,12 +46,11 @@ class MessageConsumerClass:
             consumer.close()
 
 
-#Running multiple consumers
-broker = 'kafka:9092'
-topic = 'prova'
-group_id = 'consumer-1'
-
 def start_consumers(db) :
+    broker = 'kafka:9092'
+    topic = 'prova'
+    group_id = 'consumer-1'
+
     consumer1 = MessageConsumerClass(broker, topic, group_id, db)
     consumer1.activate_listener()
 
