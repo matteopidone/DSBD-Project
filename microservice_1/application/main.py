@@ -3,8 +3,9 @@ from prometheus_api_client.utils import parse_datetime
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
 from MessageProducer import MessageProducerClass
 from threading import Thread
-from datetime import timedelta
+from datetime import timedelta, date
 from time import sleep, time
+import logging
 import json
 import os
 
@@ -40,15 +41,15 @@ def main():
     if os.environ.get('INTERVAL_TIME_SECONDS'):
         sleep_time = os.environ['INTERVAL_TIME_SECONDS']
 
-    time_list = ['1h', '3h', '12h']
+    interval_time_list = ['1h', '3h', '12h']
 
     """ Start statistics and predictions calculus """
     while True:
         for metric in data['metrics']:
-            for time in time_list:
+            for interval_time in interval_time_list:
                 
                 init_monitoring_time = time()
-                start_time = parse_datetime(time)
+                start_time = parse_datetime(interval_time)
                 end_time = parse_datetime("now")
                 chunk_size = timedelta(minutes=5)
 
@@ -61,7 +62,7 @@ def main():
                 )
                 metric_dataframe = MetricRangeDataFrame(metric_data)
 
-                thread_stats = Thread(target=calculate_stats_values, args=(init_monitoring_time, metric, metric_dataframe, time))
+                thread_stats = Thread(target=calculate_stats_values, args=(init_monitoring_time, metric, metric_dataframe, interval_time))
                 thread_stats.start()
                 thread_prediction = Thread(target=calculate_prediction_values, args=(init_monitoring_time, metric, metric_dataframe))
                 thread_prediction.start()
@@ -81,7 +82,8 @@ def is_subset(a, b):
 def calculate_metadata_values(init_monitoring_time, metric_info, values):
 
     log_time_seconds = time() - init_monitoring_time
-    write_monitoring_log(log_time_seconds)
+    message = 'Metadata - Metric ' + metric_info['__name__'] + ' took ' + str(round(log_time_seconds)) + ' to elaborate data'
+    write_monitoring_log(message)
 
     data = {
         'name': metric_info['__name__'],
@@ -96,7 +98,7 @@ def calculate_metadata_values(init_monitoring_time, metric_info, values):
     message_producer.send_msg(data)
 
 """ Statistics calculus """
-def calculate_stats_values(init_monitoring_time, metric, metric_dataframe, time):
+def calculate_stats_values(init_monitoring_time, metric, metric_dataframe, interval_time):
 
     max = round(metric_dataframe['value'].max())
     min = round(metric_dataframe['value'].min())
@@ -104,13 +106,14 @@ def calculate_stats_values(init_monitoring_time, metric, metric_dataframe, time)
     dev_std = round(metric_dataframe['value'].std())
 
     log_time_seconds = time() - init_monitoring_time
-    write_monitoring_log(log_time_seconds)
+    message = 'Statistics ' + interval_time + ' - Metric ' + metric['name'] + ' took ' + str(round(log_time_seconds)) + ' to elaborate data'
+    write_monitoring_log(message)
 
     data = {
         'name': metric['name'],
         'type': 'statistics',
         'values': {
-            'time': time,
+            'time': interval_time,
             'stats': [
                 {
                     'name': 'MAX',
@@ -152,7 +155,8 @@ def calculate_prediction_values(init_monitoring_time, metric, metric_dataframe):
     result_avg = prediction_avg.forecast(10)
 
     log_time_seconds = time() - init_monitoring_time
-    write_monitoring_log(log_time_seconds)
+    message = 'Predictions - Metric ' + metric['name'] + ' took ' + str(round(log_time_seconds)) + ' to elaborate data'
+    write_monitoring_log(message)
 
     data = {
         'name': metric['name'],
@@ -167,8 +171,13 @@ def calculate_prediction_values(init_monitoring_time, metric, metric_dataframe):
     message_producer.send_msg(data)
 
 """ Write log """
-def write_monitoring_log(log_time_seconds):
-    pass
+def write_monitoring_log(message):
+    logging.basicConfig(
+        filename='monitoring-log-file-' + str(date.today()) + '.log',
+        level=logging.DEBUG,
+        format='%(asctime)s -%(name)s- %(levelname)s: %(message)s'
+    )
+    logging.info(message)
 
 """ Start Main Script """
 
