@@ -158,4 +158,27 @@ class DataStorageDatabaseClass():
             cursor.close()
             db.close()
 
+    def insert_or_update_metrics_conf(self, metric_list) :
+        db = self.connect()
+        cursor = db.cursor()
+        metric_list_dict = ast.literal_eval(metric_list)
+        print(metric_list_dict)
+        try :            
+            for metric in metric_list_dict :
+                cursor.execute('INSERT INTO metriche (nome) VALUES ("%s")', (metric,))
+                query_result = db.commit()
+                if cursor.rowcount != 0 :
+                    print("Metric inserted")
+                    continue 
+                else :
+                    print("Metric NOT inserted")
+                    return str(False)
+            return str(True)
+        except Error as e :
+            print("Error while execute the query ", e)
+            return str(False)
+        finally:
+            cursor.close()
+            db.close()
+
 # Close connection to Database

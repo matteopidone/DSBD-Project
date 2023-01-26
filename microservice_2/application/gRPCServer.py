@@ -27,6 +27,11 @@ class EchoService(echo_pb2_grpc.EchoServiceServicer):
         db_instance = DataStorageDatabaseClass()
         result = db_instance.insert_or_update_stats_conf(stats_list=request.statsName)
         return echo_pb2.resultValue(result=result)
+    
+    def sendMetrics(self, request, context) :
+        db_instance = DataStorageDatabaseClass()
+        result = db_instance.insert_or_update_metrics_conf(metric_list=request.statsName)
+        return echo_pb2.resultValue(result=result)
 
 def serve():
     port = '50051'

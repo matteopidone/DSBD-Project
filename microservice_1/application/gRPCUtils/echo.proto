@@ -4,6 +4,7 @@ package echo;
 
 service EchoService {
   rpc sendStats (statsNameParam) returns (resultValue) {}
+  rpc sendMetrics (statsNameParam) returns (resultValue) {}
 }
 
 message resultValue {

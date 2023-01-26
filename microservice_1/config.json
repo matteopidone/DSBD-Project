@@ -22,5 +22,6 @@
             }
         }
     ],
-    "stats": [ "MIN", "MAX", "AVG", "DEV_STD" ]
+    "stats": [ "MIN", "MAX", "AVG", "DEV_STD" ],
+    "metrics_name": [ "availableMem", "node_disk_read_bytes_total", "node_cpu_seconds_total" ]
 }

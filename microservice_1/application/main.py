@@ -27,9 +27,8 @@ def main():
     data = json.load(file) 
     file.close()
     
-    tread_stats = Thread(target=insert_stats_on_data_storage, args=(data['stats'],))
-    tread_stats.start()
-    tread_stats.join()
+    insert_stats_on_data_storage(data['stats'])
+    insert_metrics_on_data_storage(data['metrics_name'])
 
     prom = PrometheusConnect(url=os.environ['PROMETHEUS_SERVER'], disable_ssl=True)
     
@@ -96,6 +95,18 @@ def insert_stats_on_data_storage(metrics) :
             stub = echo_pb2_grpc.EchoServiceStub(channel)
             print("send value")
             query_result = stub.sendStats(echo_pb2.statsNameParam(statsName=json.dumps(metrics)))
+            if query_result.result == 'True' :
+                break
+    print("exit from while")
+
+def insert_metrics_on_data_storage(metrics) :
+    print("Go To Bed")
+    sleep(60.0)
+    while True :
+        with grpc.insecure_channel('microservice_2:50051') as channel:
+            stub = echo_pb2_grpc.EchoServiceStub(channel)
+            print("send value")
+            query_result = stub.sendMetrics(echo_pb2.statsNameParam(statsName=json.dumps(metrics)))
             if query_result.result == 'True' :
                 break
     print("exit from while")
