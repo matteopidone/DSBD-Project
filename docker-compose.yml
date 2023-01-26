@@ -38,6 +38,8 @@ services:
       mysql:
         condition: service_healthy
     environment:
+      KAFKA_BROKER: kafka:9092
+      KAFKA_TOPIC: prometheusdata
       MYSQL_HOST: mysql
       PYTHONUNBUFFERED: 1
 

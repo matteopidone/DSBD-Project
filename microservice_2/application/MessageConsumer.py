@@ -47,8 +47,8 @@ class MessageConsumerClass:
 
 
 def start_consumers(db) :
-    broker = 'kafka:9092'
-    topic = 'prova'
+    broker = os.environ['KAFKA_BROKER']
+    topic = os.environ['KAFKA_TOPIC']
     group_id = 'consumer-1'
 
     consumer1 = MessageConsumerClass(broker, topic, group_id, db)
