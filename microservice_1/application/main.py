@@ -101,10 +101,24 @@ def calculate_stats_values(metric, metric_dataframe, time):
         'type': 'statistics',
         'values': {
             'time': time,
-            'max': max,
-            'min': min,
-            'avg': avg,
-            'dev_std': dev_std
+            'stats': [
+                {
+                    'name': 'MAX',
+                    'value': max
+                },
+                {
+                    'name': 'MIN',
+                    'value': min
+                },
+                {
+                    'name': 'AVG',
+                    'value': avg
+                },
+                {
+                    'name': 'DEV_STD',
+                    'value': dev_std
+                }
+            ]
         }
     }
 
