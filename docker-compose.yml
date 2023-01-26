@@ -24,6 +24,7 @@ services:
       INTERVAL_TIME_SECONDS: 600
       KAFKA_BROKER: kafka:9092
       KAFKA_TOPIC: prometheusdata
+      PYTHONUNBUFFERED: 1
 
   microservice_2:
     image: data_storage
