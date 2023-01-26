@@ -77,11 +77,13 @@ def is_subset(a, b):
 def calculate_metadata_values(metric_info, values):
 
     data = {
-        'name': 'pippo',
-        #labels
-        'autocorrelazione': 1,
-        'stazionarieta': 4,
-        'stagionalita': 8
+        'name': metric_info['__name__'],
+        'type': 'metadata',
+        'values': {
+            'autocorrelazione': 1,
+            'stazionarieta': 4,
+            'stagionalita': 8
+        }
     }
 
     message_producer.send_msg(data)
@@ -127,7 +129,7 @@ def calculate_prediction_values(metric, metric_dataframe):
 
     data = {
         'name': metric['name'],
-        'type': 'predictions',
+        'type': 'prediction',
         'values': {
             'max': max,
             'min': min,
