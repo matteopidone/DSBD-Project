@@ -37,7 +37,7 @@ class MessageConsumerClass:
                     value = self.db_instance.insert_or_update_prediction(metric_name = message_received['type'], value = message_received['values'])
 
                 elif message_received['type'] == 'metadata' :
-                    value = self.db_instance.insert_or_update_metadata(metric_name = message_received['type'], value = message_received['values'])          
+                    value = self.db_instance.insert_or_update_metadata(metric_name = message_received['type'], value = message_received['values'])
                 print("Value " + str(value))
                 consumer.commit()
         except KeyboardInterrupt:

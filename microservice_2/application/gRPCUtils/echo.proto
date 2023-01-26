@@ -6,6 +6,7 @@ service EchoService {
   rpc getAllMetrics (emptyParam) returns (resultValue) {}
   rpc getMetadataForMetrics (idMetricParam) returns (resultValue) {}
   rpc getHistoryForMetrics (idMetricParam) returns (resultValue) {}
+  rpc sendStats (statsNameParam) returns (resultValue) {}
 }
 
 message idMetricParam {
@@ -16,4 +17,8 @@ message emptyParam {}
 
 message resultValue {
   string result = 1;
+}
+
+message statsNameParam {
+  string statsName = 1;
 }

@@ -8,6 +8,12 @@ from datetime import timedelta
 from time import sleep, time
 import json
 import os
+import grpc
+import sys
+sys.path.append('./gRPCUtils')
+
+import echo_pb2
+import echo_pb2_grpc
 
 """ Main Function """
 
@@ -20,6 +26,10 @@ def main():
 
     data = json.load(file) 
     file.close()
+    
+    tread_stats = Thread(target=insert_stats_on_data_storage, args=(data['stats'],))
+    tread_stats.start()
+    tread_stats.join()
 
     prom = PrometheusConnect(url=os.environ['PROMETHEUS_SERVER'], disable_ssl=True)
     
@@ -77,6 +87,19 @@ def is_subset(a, b):
         if k in b:
             subset[k] = b[k]
     return subset == a
+
+def insert_stats_on_data_storage(metrics) :
+    print("Go To Bed")
+    sleep(60.0)
+    while True :
+        with grpc.insecure_channel('microservice_2:50051') as channel:
+            stub = echo_pb2_grpc.EchoServiceStub(channel)
+            print("send value")
+            query_result = stub.sendStats(echo_pb2.statsNameParam(statsName=json.dumps(metrics)))
+            if query_result.result == 'True' :
+                break
+    print("exit from while")
+
 
 """ Metadata calculus """
 def calculate_metadata_values(init_monitoring_time, metric_info, values):
