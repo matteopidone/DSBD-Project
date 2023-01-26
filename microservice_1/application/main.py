@@ -4,7 +4,7 @@ from statsmodels.tsa.holtwinters import ExponentialSmoothing
 from MessageProducer import MessageProducerClass
 from threading import Thread
 from datetime import timedelta
-from time import sleep
+from time import sleep, time
 import json
 import os
 
@@ -23,13 +23,16 @@ def main():
     prom = PrometheusConnect(url=os.environ['PROMETHEUS_SERVER'], disable_ssl=True)
     
     """ Start metadata calculus """
+    init_time = time()
     queryResult = prom.custom_query(query='{job="' + data['job'] +'"}[' + data['range_time'] +']')
+    time_query_delay = time() - init_time
 
     for metricResultQuery in queryResult:
         for metric in data['metrics']:
             if metricResultQuery['metric']['__name__'] == metric['name']:
                 if is_subset( metric['labels'], metricResultQuery['metric']):
-                    thread_metadata = Thread(target=calculate_metadata_values, args=(metricResultQuery['metric'], metricResultQuery['values']))
+                    init_monitoring_time = time() - time_query_delay
+                    thread_metadata = Thread(target=calculate_metadata_values, args=(init_monitoring_time, metricResultQuery['metric'], metricResultQuery['values']))
                     thread_metadata.start()
                     break
 
@@ -44,6 +47,7 @@ def main():
         for metric in data['metrics']:
             for time in time_list:
                 
+                init_monitoring_time = time()
                 start_time = parse_datetime(time)
                 end_time = parse_datetime("now")
                 chunk_size = timedelta(minutes=5)
@@ -57,9 +61,9 @@ def main():
                 )
                 metric_dataframe = MetricRangeDataFrame(metric_data)
 
-                thread_stats = Thread(target=calculate_stats_values, args=(metric, metric_dataframe, time))
+                thread_stats = Thread(target=calculate_stats_values, args=(init_monitoring_time, metric, metric_dataframe, time))
                 thread_stats.start()
-                thread_prediction = Thread(target=calculate_prediction_values, args=(metric, metric_dataframe))
+                thread_prediction = Thread(target=calculate_prediction_values, args=(init_monitoring_time, metric, metric_dataframe))
                 thread_prediction.start()
 
         sleep(sleep_time)
@@ -74,7 +78,10 @@ def is_subset(a, b):
     return subset == a
 
 """ Metadata calculus """
-def calculate_metadata_values(metric_info, values):
+def calculate_metadata_values(init_monitoring_time, metric_info, values):
+
+    log_time_seconds = time() - init_monitoring_time
+    write_monitoring_log(log_time_seconds)
 
     data = {
         'name': metric_info['__name__'],
@@ -89,12 +96,15 @@ def calculate_metadata_values(metric_info, values):
     message_producer.send_msg(data)
 
 """ Statistics calculus """
-def calculate_stats_values(metric, metric_dataframe, time):
+def calculate_stats_values(init_monitoring_time, metric, metric_dataframe, time):
 
     max = round(metric_dataframe['value'].max())
     min = round(metric_dataframe['value'].min())
     avg = round(metric_dataframe['value'].mean())
     dev_std = round(metric_dataframe['value'].std())
+
+    log_time_seconds = time() - init_monitoring_time
+    write_monitoring_log(log_time_seconds)
 
     data = {
         'name': metric['name'],
@@ -125,7 +135,7 @@ def calculate_stats_values(metric, metric_dataframe, time):
     message_producer.send_msg(data)
 
 """ Predictions calculus """
-def calculate_prediction_values(metric, metric_dataframe):
+def calculate_prediction_values(init_monitoring_time, metric, metric_dataframe):
 
     resampled_data = metric_dataframe['value'].resample(rule='1T')
 
@@ -141,6 +151,9 @@ def calculate_prediction_values(metric, metric_dataframe):
     result_min = prediction_min.forecast(10)
     result_avg = prediction_avg.forecast(10)
 
+    log_time_seconds = time() - init_monitoring_time
+    write_monitoring_log(log_time_seconds)
+
     data = {
         'name': metric['name'],
         'type': 'prediction',
@@ -152,6 +165,10 @@ def calculate_prediction_values(metric, metric_dataframe):
     }
 
     message_producer.send_msg(data)
+
+""" Write log """
+def write_monitoring_log(log_time_seconds):
+    pass
 
 """ Start Main Script """
 
