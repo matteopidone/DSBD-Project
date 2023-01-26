@@ -31,13 +31,13 @@ class MessageConsumerClass:
                 #print("received message = ", message.value)
                 value = 'Pippo value'
                 if message_received['type'] == 'statistics' :
-                    value = self.db_instance.insert_or_update_stats(metric_name = message_received['type'], value = message_received['value'])
+                    value = self.db_instance.insert_or_update_stats(metric_name = message_received['type'], value = message_received['values'])
 
                 elif message_received['type'] == 'prediction' :
-                    value = self.db_instance.insert_or_update_prediction(metric_name = message_received['type'], value = message_received['value'])
+                    value = self.db_instance.insert_or_update_prediction(metric_name = message_received['type'], value = message_received['values'])
 
                 elif message_received['type'] == 'metadata' :
-                    value = self.db_instance.insert_or_update_metadata(metric_name = message_received['type'], value = message_received['value'])          
+                    value = self.db_instance.insert_or_update_metadata(metric_name = message_received['type'], value = message_received['values'])          
                 print("Value " + str(value))
                 consumer.commit()
         except KeyboardInterrupt:
@@ -47,8 +47,8 @@ class MessageConsumerClass:
 
 
 def start_consumers(db) :
-    broker = 'kafka:9092'
-    topic = 'prova'
+    broker = os.environ['KAFKA_BROKER']
+    topic = os.environ['KAFKA_TOPIC']
     group_id = 'consumer-1'
 
     consumer1 = MessageConsumerClass(broker, topic, group_id, db)

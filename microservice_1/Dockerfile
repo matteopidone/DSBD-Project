@@ -12,4 +12,5 @@ RUN apt-get install vim -y
 # End
 
 RUN pip install --no-cache-dir -r ../py_libraries.txt
+
 CMD ["python", "main.py"]
