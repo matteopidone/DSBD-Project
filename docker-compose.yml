@@ -22,9 +22,14 @@ services:
     environment:
       PROMETHEUS_SERVER: http://15.160.61.227:29090
       INTERVAL_TIME_SECONDS: 600
+      PATH_LOG_MONITOR: /usr/src/application/log/
       KAFKA_BROKER: kafka:9092
       KAFKA_TOPIC: prometheusdata
       PYTHONUNBUFFERED: 1
+    volumes:
+      - type: bind
+        source: ./microservice_1/application/log
+        target: /usr/src/application/log/
 
   microservice_2:
     image: data_storage

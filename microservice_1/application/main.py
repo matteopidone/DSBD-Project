@@ -2,10 +2,10 @@ from prometheus_api_client import PrometheusConnect, MetricRangeDataFrame
 from prometheus_api_client.utils import parse_datetime
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
 from MessageProducer import MessageProducerClass
+from LogMonitor import LogMonitorClass
 from threading import Thread
-from datetime import timedelta, date
+from datetime import timedelta
 from time import sleep, time
-import logging
 import json
 import os
 
@@ -81,9 +81,10 @@ def is_subset(a, b):
 """ Metadata calculus """
 def calculate_metadata_values(init_monitoring_time, metric_info, values):
 
+    """ Write Log """
     log_time_seconds = time() - init_monitoring_time
-    message = 'Metadata - Metric ' + metric_info['__name__'] + ' took ' + str(round(log_time_seconds)) + ' to elaborate data'
-    write_monitoring_log(message)
+    message = 'Metadata - Metric ' + metric_info['__name__'] + ' took ' + str(round(log_time_seconds)) + ' sec to elaborate data'
+    log_monitor.write_log_monitoring(message)
 
     data = {
         'name': metric_info['__name__'],
@@ -105,9 +106,10 @@ def calculate_stats_values(init_monitoring_time, metric, metric_dataframe, inter
     avg = round(metric_dataframe['value'].mean())
     dev_std = round(metric_dataframe['value'].std())
 
+    """ Write Log """
     log_time_seconds = time() - init_monitoring_time
-    message = 'Statistics ' + interval_time + ' - Metric ' + metric['name'] + ' took ' + str(round(log_time_seconds)) + ' to elaborate data'
-    write_monitoring_log(message)
+    message = 'Statistics ' + interval_time + ' - Metric ' + metric['name'] + ' took ' + str(round(log_time_seconds)) + ' sec to elaborate data'
+    log_monitor.write_log_monitoring(message)
 
     data = {
         'name': metric['name'],
@@ -154,9 +156,10 @@ def calculate_prediction_values(init_monitoring_time, metric, metric_dataframe):
     result_min = prediction_min.forecast(10)
     result_avg = prediction_avg.forecast(10)
 
+    """ Write Log """
     log_time_seconds = time() - init_monitoring_time
-    message = 'Predictions - Metric ' + metric['name'] + ' took ' + str(round(log_time_seconds)) + ' to elaborate data'
-    write_monitoring_log(message)
+    message = 'Predictions - Metric ' + metric['name'] + ' took ' + str(round(log_time_seconds)) + ' sec to elaborate data'
+    log_monitor.write_log_monitoring(message)
 
     data = {
         'name': metric['name'],
@@ -170,19 +173,11 @@ def calculate_prediction_values(init_monitoring_time, metric, metric_dataframe):
 
     message_producer.send_msg(data)
 
-""" Write log """
-def write_monitoring_log(message):
-    logging.basicConfig(
-        filename='monitoring-log-file-' + str(date.today()) + '.log',
-        level=logging.DEBUG,
-        format='%(asctime)s -%(name)s- %(levelname)s: %(message)s'
-    )
-    logging.info(message)
-
 """ Start Main Script """
 
 if __name__ == '__main__':
     broker = os.environ['KAFKA_BROKER']
     topic = os.environ['KAFKA_TOPIC']
     message_producer = MessageProducerClass(broker, topic)
+    log_monitor = LogMonitorClass()
     main()
