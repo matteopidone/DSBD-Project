@@ -71,14 +71,17 @@ class DataStorageDatabaseClass():
         db = self.connect()
         cursor = db.cursor()
         try :
-            cursor.execute()
-            query_result = cursor.fetchone()
-            if query_result :
-                return True
+            id_metric = 'SELECT m2.id FROM metriche AS m2 WHERE m2.nome = "' + str(metric_name) + '"'
+            query = 'INSERT INTO metriche (id, nome, metadata) VALUES ((' + str(id_metric) + '), "' + str(metric_name) +'", "' + str(value) + '") ON DUPLICATE KEY UPDATE metadata = "'+ str(value) + '";'
+            cursor.execute(query)
+            query_result = db.commit()
+            if cursor.rowcount != 0 :
+                print("METADATA UPDATED")
+                return True 
             else :
                 return False
-        except :
-            print("Error while execute the query")
+        except Error as e :
+            print("Error while execute the query ", e)
             return False
         finally:
             cursor.close()
