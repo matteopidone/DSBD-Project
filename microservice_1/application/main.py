@@ -89,7 +89,7 @@ def is_subset(a, b):
 
 def insert_stats_on_data_storage(metrics) :
     print("Go To Bed")
-    sleep(60.0)
+    sleep(20.0)
     while True :
         with grpc.insecure_channel('microservice_2:50051') as channel:
             stub = echo_pb2_grpc.EchoServiceStub(channel)
@@ -101,7 +101,7 @@ def insert_stats_on_data_storage(metrics) :
 
 def insert_metrics_on_data_storage(metrics) :
     print("Go To Bed")
-    sleep(60.0)
+    sleep(20.0)
     while True :
         with grpc.insecure_channel('microservice_2:50051') as channel:
             stub = echo_pb2_grpc.EchoServiceStub(channel)
