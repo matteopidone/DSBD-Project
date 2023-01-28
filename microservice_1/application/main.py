@@ -15,6 +15,9 @@ sys.path.append('./gRPCUtils')
 import echo_pb2
 import echo_pb2_grpc
 from MetricCalculator import MetricCalculator
+from multiprocessing import Process
+from gRPCServer import serve
+
 
 """ Main Function """
 
@@ -28,8 +31,8 @@ def main():
     data = json.load(file) 
     file.close()
     
-    #insert_stats_on_data_storage(data['stats'])
-    #insert_metrics_on_data_storage(data['metrics'])
+    insert_stats_on_data_storage(data['stats'])
+    insert_metrics_on_data_storage(data['metrics'])
 
     prom = PrometheusConnect(url=os.environ['PROMETHEUS_SERVER'], disable_ssl=True)
     
@@ -220,4 +223,6 @@ if __name__ == '__main__':
     topic = os.environ['KAFKA_TOPIC']
     message_producer = MessageProducerClass(broker, topic)
     log_monitor = LogMonitorClass()
+    p = Process(target=serve, args=[])
+    p.start()
     main()
