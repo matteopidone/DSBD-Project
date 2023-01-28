@@ -4,13 +4,14 @@ sys.path.append('./gRPCUtils')
 import echo_pb2
 import echo_pb2_grpc
 import asyncio
+from concurrent import futures
 from MetricCalculator import MetricCalculator
 
 class EchoService(echo_pb2_grpc.EchoServiceServicer):
 
     def getNumberOfViolationsPast(self, request, context) :
         calculator_instance = MetricCalculator()
-        result = calculator_instance.get_number_violation(request.listMetricsParam)
+        result = calculator_instance.get_number_violation(request.listMetrics)
         
         return echo_pb2.resultValue(result=result)
 
