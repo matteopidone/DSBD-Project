@@ -13,6 +13,11 @@ class EchoService(echo_pb2_grpc.EchoServiceServicer):
         result = db_instance.get_all_metrics()
         return echo_pb2.resultValue(result=result)
     
+    def getAllStatistics(self, request, context) :
+        db_instance = DataStorageDatabaseClass()
+        result = db_instance.get_all_statistics()
+        return echo_pb2.resultValue(result=result)
+
     def getMetadataForMetrics(self, request, context) :
         db_instance = DataStorageDatabaseClass()
         result = db_instance.get_metadata_for_metrics(id_metric=request.idMetric)
