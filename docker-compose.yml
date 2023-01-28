@@ -10,7 +10,7 @@ services:
   microservice_1:
     image: etl_data_pipeline
     container_name: etl_data_pipeline_container
-    build: 
+    build:
       context: ./microservice_1
       dockerfile: Dockerfile
     ports:
@@ -34,7 +34,7 @@ services:
   microservice_2:
     image: data_storage
     container_name: data_storage_container
-    build: 
+    build:
       context: ./microservice_2
       dockerfile: Dockerfile
     restart: always
@@ -52,7 +52,7 @@ services:
   microservice_3:
     image: data_retrieval
     container_name: data_retrieval_container
-    build: 
+    build:
       context: ./microservice_3
       dockerfile: Dockerfile
     ports:
@@ -63,6 +63,19 @@ services:
         condition: service_healthy
     environment:
       MYSQL_HOST: mysql
+      PYTHONUNBUFFERED: 1
+
+  microservice_4:
+    image: sla_manager
+    container_name: sla_manager_container
+    build:
+      context: ./microservice_4
+      dockerfile: Dockerfile
+    ports:
+      - 9004:9000
+    restart: always
+    environment:
+      DATA_STORAGE_GRPC_SERVER: microservice_2:50051
       PYTHONUNBUFFERED: 1
 
   mysql:
@@ -108,9 +121,3 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-
-  #adminer:
-  #  image: adminer
-  #  restart: always
-  #  ports:
-  #    - 8080:8080

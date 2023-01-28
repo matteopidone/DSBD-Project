@@ -1,0 +1,60 @@
+<h1 class="microservice_title">SLA Manager</h1>
+<body>
+    <form action="submitSLA" method="post">
+        <label for="select">Seleziona le metriche da inserire in un SLA:</label>
+        
+        <div>
+            {% for metric in results[0] %}
+            <div class="metrics_range_sla_block">
+                <label for="{{ metric }}"><input type="checkbox" id="{{ metric }}" name="metric_name" value="{{ metric }}">&nbsp;{{ metric }}</label>
+                <div>
+                    {% for stat in results[1] %}
+                    <label for="{{ metric }}-{{ stat }}">{{ stat }}&nbsp;<input type="number" id="{{ metric }}-{{ stat }}" name="{{ metric }}-{{ stat }}"></label>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <input type="submit" value="Conferma">
+    </form>
+</body>
+
+<style>
+body {
+    font-size: 25px;
+}
+
+form {
+    width: 35%;
+    min-width: max-content;
+    margin: 50px;
+    padding: 15px;
+    border: 2px solid;
+}
+
+label {
+    max-width: max-content;
+}
+
+input[type=number] {
+    width: 100px;
+}
+
+input[type=submit] {
+    font-size: 20px;
+}
+
+/* Classes */
+
+.microservice_title {
+    font-size: 50px;
+    text-align: center;
+}
+
+.metrics_range_sla_block {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 10px;
+}
+</style>
