@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package echo;
+
+service EchoService {
+  rpc getNumberOfViolationsPast (listMetricsParam) returns (resultValue) {}
+  rpc getNumberOfViolationsFuture (listMetricsParam) returns (resultValue) {}
+  rpc getAllMetrics (emptyParam) returns (resultValue) {}
+  rpc getAllStatistics(emptyParam) returns (resultValue) {}
+}
+
+message resultValue {
+  string result = 1;
+}
+
+message listMetricsParam {
+  string listMetrics = 1;
+}
+
+message emptyParam {}
