@@ -47,15 +47,15 @@
                 },
                 {
                     "name":"1h",
-                    "type":"INT(11)"
+                    "type":"INT(20)"
                 },
                 {
                     "name":"3h",
-                    "type":"INT(11)"
+                    "type":"INT(20)"
                 },
                 {
                     "name":"12h",
-                    "type":"INT(11)"
+                    "type":"INT(20)"
                 }
             ],
             "primary_key": "PRIMARY KEY (id_metrica, id_statistica)",
