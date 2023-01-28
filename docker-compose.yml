@@ -76,6 +76,7 @@ services:
     restart: always
     environment:
       DATA_STORAGE_GRPC_SERVER: microservice_2:50051
+      ETL_DATA_PIPELINE_GRPC_SERVER: microservice_1:50051
       PYTHONUNBUFFERED: 1
 
   mysql:

@@ -4,6 +4,7 @@ package echo;
 
 service EchoService {
   rpc getAllMetrics (emptyParam) returns (resultValue) {}
+  rpc getAllStatistics(emptyParam) returns (resultValue) {}
   rpc getMetadataForMetrics (idMetricParam) returns (resultValue) {}
   rpc getHistoryForMetrics (idMetricParam) returns (resultValue) {}
   rpc sendStats (statsNameParam) returns (resultValue) {}
