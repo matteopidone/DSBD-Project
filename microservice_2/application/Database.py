@@ -142,7 +142,6 @@ class DataStorageDatabaseClass():
         db = self.connect()
         cursor = db.cursor()
         stats_list_dict = ast.literal_eval(stats_list)
-        print(stats_list_dict)
         try :            
             for stats in stats_list_dict :
                 cursor.execute('INSERT INTO statistiche (nome) VALUES (%s)', (str(stats),))
