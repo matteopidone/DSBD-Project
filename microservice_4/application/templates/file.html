@@ -3,9 +3,15 @@
     <form>
         <label for="select">Seleziona le metriche da inserire in un SLA:</label>
         
-        <div class="metrics_block">
+        <div>
             {% for row in results %}
-            <label for="{{ row }}"><input type="checkbox" id="{{ row }}" name="{{ row }}" value="{{ row }}">&nbsp;{{ row }}</label>
+            <div class="metrics_range_sla_block">
+                <label for="{{ row }}"><input type="checkbox" id="{{ row }}" name="{{ row }}" value="{{ row }}">&nbsp;{{ row }}</label>
+                <div>
+                    <label for="{{ row }}-MAX">MAX&nbsp;<input type="number" id="{{ row }}-MAX" name="{{ row }}-MAX" value=0></label>
+                    <label for="{{ row }}-MIN">MIN&nbsp;<input type="number" id="{{ row }}-MIN" name="{{ row }}-MIN" value=0></label>
+                </div>
+            </div>
             {% endfor %}
         </div>
         
@@ -19,7 +25,8 @@ body {
 }
 
 form {
-    max-width: max-content;
+    width: 35%;
+    min-width: max-content;
     margin: 50px;
     padding: 15px;
     border: 2px solid;
@@ -29,14 +36,24 @@ label {
     max-width: max-content;
 }
 
+input[type=number] {
+    width: 100px;
+}
+
+input[type=submit] {
+    font-size: 20px;
+}
+
+/* Classes */
+
 .microservice_title {
     font-size: 50px;
     text-align: center;
 }
 
-.metrics_block {
+.metrics_range_sla_block {
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
     margin: 10px 10px;
 }
 </style>
