@@ -4,12 +4,13 @@
         <label for="select">Seleziona le metriche da inserire in un SLA:</label>
         
         <div>
-            {% for row in results %}
+            {% for metric in results[0] %}
             <div class="metrics_range_sla_block">
-                <label for="{{ row }}"><input type="checkbox" id="{{ row }}" name="{{ row }}" value="{{ row }}">&nbsp;{{ row }}</label>
+                <label for="{{ metric }}"><input type="checkbox" id="{{ metric }}" name="{{ metric }}" value="{{ metric }}">&nbsp;{{ metric }}</label>
                 <div>
-                    <label for="{{ row }}-MAX">MAX&nbsp;<input type="number" id="{{ row }}-MAX" name="{{ row }}-MAX" value=0></label>
-                    <label for="{{ row }}-MIN">MIN&nbsp;<input type="number" id="{{ row }}-MIN" name="{{ row }}-MIN" value=0></label>
+                    {% for stat in results[1] %}
+                    <label for="{{ metric }}-{{ stat }}">{{ stat }}&nbsp;<input type="number" id="{{ metric }}-{{ stat }}" name="{{ metric }}-{{ stat }}" value=0></label>
+                    {% endfor %}
                 </div>
             </div>
             {% endfor %}

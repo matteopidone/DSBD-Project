@@ -75,6 +75,7 @@ services:
       - 9004:9000
     restart: always
     environment:
+      DATA_STORAGE_GRPC_SERVER: microservice_2:50051
       PYTHONUNBUFFERED: 1
 
   mysql:
