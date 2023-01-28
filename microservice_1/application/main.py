@@ -1,6 +1,7 @@
 from prometheus_api_client import PrometheusConnect, MetricRangeDataFrame
 from prometheus_api_client.utils import parse_datetime
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
+from statsmodels.tsa.stattools import adfuller
 from MessageProducer import MessageProducerClass
 from LogMonitor import LogMonitorClass
 from threading import Thread
@@ -42,7 +43,8 @@ def main():
             if metricResultQuery['metric']['__name__'] == metric['name']:
                 if is_subset( metric['labels'], metricResultQuery['metric']):
                     init_monitoring_time = time() - time_query_delay
-                    thread_metadata = Thread(target=calculate_metadata_values, args=(init_monitoring_time, metricResultQuery['metric'], metricResultQuery['values']))
+                    metric_values = MetricRangeDataFrame(metricResultQuery)
+                    thread_metadata = Thread(target=calculate_metadata_values, args=(init_monitoring_time, metricResultQuery['metric'], metric_values['value']))
                     thread_metadata.start()
                     break
 
@@ -123,14 +125,30 @@ def calculate_metadata_values(init_monitoring_time, metric_info, values):
     message = 'Metadata - Metric ' + metric_info['__name__'] + ' took ' + str(round(log_time_seconds)) + ' sec to elaborate data'
     log_monitor.write_log_monitoring(message)
 
+    """ Stationarity """
+    stationarity_test = adfuller(values, autolag='AIC')
+    stationarity = 'false'
+    if stationarity_test[1] <= 0.05:
+        print(metric_info['__name__'] + ' is stationary')
+        stationarity = 'true'
+
     data = {
         'name': metric_info['__name__'],
         'type': 'metadata',
-        'values': {
-            'autocorrelazione': 1,
-            'stazionarieta': 4,
-            'stagionalita': 8
-        }
+        'values': [
+            {
+                'name': 'autocorrelazione',
+                'value': 4
+            },
+            {
+                'name': 'stazionarieta',
+                'value': stationarity
+            },
+            {
+                'name': 'stagionalita',
+                'value': 3
+            },
+        ]
     }
 
     message_producer.send_msg(data)
