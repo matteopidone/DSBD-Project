@@ -65,6 +65,18 @@ services:
       MYSQL_HOST: mysql
       PYTHONUNBUFFERED: 1
 
+  microservice_4:
+    image: sla_manager
+    container_name: sla_manager_container
+    build: 
+      context: ./microservice_4
+      dockerfile: Dockerfile
+    ports:
+      - 9004:9000
+    restart: always
+    environment:
+      PYTHONUNBUFFERED: 1
+
   mysql:
     image: mysql:latest
     container_name: mysql_container
