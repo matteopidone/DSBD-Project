@@ -1,15 +1,15 @@
 <h1 class="microservice_title">SLA Manager</h1>
 <body>
-    <form>
+    <form action="submitSLA" method="post">
         <label for="select">Seleziona le metriche da inserire in un SLA:</label>
         
         <div>
             {% for metric in results[0] %}
             <div class="metrics_range_sla_block">
-                <label for="{{ metric }}"><input type="checkbox" id="{{ metric }}" name="{{ metric }}" value="{{ metric }}">&nbsp;{{ metric }}</label>
+                <label for="{{ metric }}"><input type="checkbox" id="{{ metric }}" name="metric_name" value="{{ metric }}">&nbsp;{{ metric }}</label>
                 <div>
                     {% for stat in results[1] %}
-                    <label for="{{ metric }}-{{ stat }}">{{ stat }}&nbsp;<input type="number" id="{{ metric }}-{{ stat }}" name="{{ metric }}-{{ stat }}" value=0></label>
+                    <label for="{{ metric }}-{{ stat }}">{{ stat }}&nbsp;<input type="number" id="{{ metric }}-{{ stat }}" name="{{ metric }}-{{ stat }}"></label>
                     {% endfor %}
                 </div>
             </div>
