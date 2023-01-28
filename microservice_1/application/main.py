@@ -14,6 +14,7 @@ sys.path.append('./gRPCUtils')
 
 import echo_pb2
 import echo_pb2_grpc
+from MetricCalculator import MetricCalculator
 
 """ Main Function """
 
@@ -27,8 +28,8 @@ def main():
     data = json.load(file) 
     file.close()
     
-    insert_stats_on_data_storage(data['stats'])
-    insert_metrics_on_data_storage(data['metrics'])
+    #insert_stats_on_data_storage(data['stats'])
+    #insert_metrics_on_data_storage(data['metrics'])
 
     prom = PrometheusConnect(url=os.environ['PROMETHEUS_SERVER'], disable_ssl=True)
     
@@ -51,9 +52,11 @@ def main():
         sleep_time = int(os.environ['INTERVAL_TIME_SECONDS'])
 
     interval_time_list = ['1h', '3h', '12h']
+    MetricCalculator.interval_time_list = interval_time_list
 
     """ Start statistics and predictions calculus """
     while True:
+        MetricCalculator.metrics = { '1h': list(), '3h': list(), '12h': list() }
         for metric in data['metrics']:
             for interval_time in interval_time_list:
                 
@@ -70,12 +73,12 @@ def main():
                     chunk_size=chunk_size,
                 )
                 metric_dataframe = MetricRangeDataFrame(metric_data)
+                MetricCalculator.metrics[interval_time].append(metric_dataframe)
 
                 thread_stats = Thread(target=calculate_stats_values, args=(init_monitoring_time, metric, metric_dataframe, interval_time))
                 thread_stats.start()
                 thread_prediction = Thread(target=calculate_prediction_values, args=(init_monitoring_time, metric, metric_dataframe))
                 thread_prediction.start()
-
         sleep(sleep_time)
 
 """ Functions """
