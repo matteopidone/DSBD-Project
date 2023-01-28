@@ -5,6 +5,7 @@ package echo;
 service EchoService {
   rpc sendStats (statsNameParam) returns (resultValue) {}
   rpc sendMetrics (statsNameParam) returns (resultValue) {}
+  rpc getNumberOfViolations (listMetricsParam) returns (resultValue) {}
 }
 
 message resultValue {
@@ -14,3 +15,9 @@ message resultValue {
 message statsNameParam {
   string statsName = 1;
 }
+
+message listMetricsParam {
+  string listMetrics = 1;
+}
+
+message emptyParam {}
