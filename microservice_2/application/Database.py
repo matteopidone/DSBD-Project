@@ -104,6 +104,23 @@ class DataStorageDatabaseClass():
             cursor.close()
             db.close()
     
+    def get_all_statistics(self) :
+        db = self.connect()
+        cursor = db.cursor()
+        try:
+            cursor.execute("SELECT * FROM statistiche")
+            query_result = cursor.fetchall()
+            if query_result :
+                return str(query_result).strip('[]')
+            else :
+                return str()
+        except :
+            print("Error while execute the query")
+            return str()
+        finally:
+            cursor.close()
+            db.close()
+
     def get_metadata_for_metrics(self, id_metric) :
         db = self.connect()
         cursor = db.cursor()
