@@ -3,18 +3,9 @@ syntax = "proto3";
 package echo;
 
 service EchoService {
-  rpc getAllMetrics (emptyParam) returns (resultValue) {}
-  rpc getMetadataForMetrics (idMetricParam) returns (resultValue) {}
-  rpc getHistoryForMetrics (idMetricParam) returns (resultValue) {}
   rpc sendStats (statsNameParam) returns (resultValue) {}
   rpc sendMetrics (statsNameParam) returns (resultValue) {}
 }
-
-message idMetricParam {
-  string idMetric = 1;
-}
-
-message emptyParam {}
 
 message resultValue {
   string result = 1;

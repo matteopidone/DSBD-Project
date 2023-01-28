@@ -8,6 +8,12 @@ from datetime import timedelta
 from time import sleep, time
 import json
 import os
+import grpc
+import sys
+sys.path.append('./gRPCUtils')
+
+import echo_pb2
+import echo_pb2_grpc
 
 """ Main Function """
 
@@ -20,6 +26,9 @@ def main():
 
     data = json.load(file) 
     file.close()
+    
+    insert_stats_on_data_storage(data['stats'])
+    insert_metrics_on_data_storage(data['metrics'])
 
     prom = PrometheusConnect(url=os.environ['PROMETHEUS_SERVER'], disable_ssl=True)
     
@@ -39,7 +48,7 @@ def main():
 
     sleep_time = 600
     if os.environ.get('INTERVAL_TIME_SECONDS'):
-        sleep_time = os.environ['INTERVAL_TIME_SECONDS']
+        sleep_time = int(os.environ['INTERVAL_TIME_SECONDS'])
 
     interval_time_list = ['1h', '3h', '12h']
 
@@ -77,6 +86,34 @@ def is_subset(a, b):
         if k in b:
             subset[k] = b[k]
     return subset == a
+
+def insert_stats_on_data_storage(metrics) :
+    print("Waiting grpc server")
+    sleep(20.0)
+    while True :
+        with grpc.insecure_channel('microservice_2:50051') as channel:
+            stub = echo_pb2_grpc.EchoServiceStub(channel)
+            print("send value")
+            query_result = stub.sendStats(echo_pb2.statsNameParam(statsName=json.dumps(metrics)))
+            if query_result.result == 'True' :
+                break
+    print("exit from while")
+
+def insert_metrics_on_data_storage(metrics) :
+    print("Waiting grpc server")
+    sleep(20.0)
+    metric_to_insert = list()
+    for metric in metrics :
+        metric_to_insert.append(metric['name'])
+    while True :
+        with grpc.insecure_channel('microservice_2:50051') as channel:
+            stub = echo_pb2_grpc.EchoServiceStub(channel)
+            print("send value")
+            query_result = stub.sendMetrics(echo_pb2.statsNameParam(statsName=json.dumps(metric_to_insert)))
+            if query_result.result == 'True' :
+                break
+    print("exit from while")
+
 
 """ Metadata calculus """
 def calculate_metadata_values(init_monitoring_time, metric_info, values):

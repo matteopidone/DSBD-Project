@@ -1,3 +1,5 @@
 prometheus-api-client
 kafka-python
 statsmodels
+grpcio
+grpcio-tools
