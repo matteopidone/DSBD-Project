@@ -24,8 +24,13 @@ class EchoServiceStub(object):
                 request_serializer=echo__pb2.statsNameParam.SerializeToString,
                 response_deserializer=echo__pb2.resultValue.FromString,
                 )
-        self.getNumberOfViolations = channel.unary_unary(
-                '/echo.EchoService/getNumberOfViolations',
+        self.getNumberOfViolationsPast = channel.unary_unary(
+                '/echo.EchoService/getNumberOfViolationsPast',
+                request_serializer=echo__pb2.listMetricsParam.SerializeToString,
+                response_deserializer=echo__pb2.resultValue.FromString,
+                )
+        self.getNumberOfViolationsFuture = channel.unary_unary(
+                '/echo.EchoService/getNumberOfViolationsFuture',
                 request_serializer=echo__pb2.listMetricsParam.SerializeToString,
                 response_deserializer=echo__pb2.resultValue.FromString,
                 )
@@ -46,7 +51,13 @@ class EchoServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def getNumberOfViolations(self, request, context):
+    def getNumberOfViolationsPast(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def getNumberOfViolationsFuture(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -65,8 +76,13 @@ def add_EchoServiceServicer_to_server(servicer, server):
                     request_deserializer=echo__pb2.statsNameParam.FromString,
                     response_serializer=echo__pb2.resultValue.SerializeToString,
             ),
-            'getNumberOfViolations': grpc.unary_unary_rpc_method_handler(
-                    servicer.getNumberOfViolations,
+            'getNumberOfViolationsPast': grpc.unary_unary_rpc_method_handler(
+                    servicer.getNumberOfViolationsPast,
+                    request_deserializer=echo__pb2.listMetricsParam.FromString,
+                    response_serializer=echo__pb2.resultValue.SerializeToString,
+            ),
+            'getNumberOfViolationsFuture': grpc.unary_unary_rpc_method_handler(
+                    servicer.getNumberOfViolationsFuture,
                     request_deserializer=echo__pb2.listMetricsParam.FromString,
                     response_serializer=echo__pb2.resultValue.SerializeToString,
             ),
@@ -115,7 +131,7 @@ class EchoService(object):
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def getNumberOfViolations(request,
+    def getNumberOfViolationsPast(request,
             target,
             options=(),
             channel_credentials=None,
@@ -125,7 +141,24 @@ class EchoService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/echo.EchoService/getNumberOfViolations',
+        return grpc.experimental.unary_unary(request, target, '/echo.EchoService/getNumberOfViolationsPast',
+            echo__pb2.listMetricsParam.SerializeToString,
+            echo__pb2.resultValue.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def getNumberOfViolationsFuture(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/echo.EchoService/getNumberOfViolationsFuture',
             echo__pb2.listMetricsParam.SerializeToString,
             echo__pb2.resultValue.FromString,
             options, channel_credentials,
