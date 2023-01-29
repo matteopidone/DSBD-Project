@@ -60,12 +60,12 @@ class DataStorageDatabaseClass():
 
     """ Insert or Update """
 
-    def insert_or_update_stats(self, metric_name, value) :
+    def insert_or_update_stats(self, metric_name, values) :
         db = self.connect()
         cursor = db.cursor()
         try :
-            time = value['time']
-            for stats in value['stats'] :
+            time = values['time']
+            for stats in values['stats'] :
                 id_metric = 'SELECT id FROM metriche WHERE nome = "' + str(metric_name) + '"'
                 id_statistics = 'SELECT id FROM statistiche WHERE nome = "' + str(stats['name']) + '"'
                 query = 'INSERT INTO statistiche_metriche (id_metrica, id_statistica,' + str(time) + ') VALUES ((' + str(id_metric) + '), (' + id_statistics + '),' + str(stats['value']) +') ON DUPLICATE KEY UPDATE ' + str(time) + ' = '+ str(stats['value']) +';'
@@ -84,7 +84,7 @@ class DataStorageDatabaseClass():
             cursor.close()
             db.close()
     
-    def insert_or_update_prediction(self, metric_name, value) :
+    def insert_or_update_prediction(self, metric_name, values) :
         db = self.connect()
         cursor = db.cursor()
         try :
@@ -102,12 +102,12 @@ class DataStorageDatabaseClass():
             cursor.close()
             db.close()
 
-    def insert_or_update_metadata(self, metric_name, value) :
+    def insert_or_update_metadata(self, metric_name, values) :
         db = self.connect()
         cursor = db.cursor()
         try :
             id_metric = 'SELECT m2.id FROM metriche AS m2 WHERE m2.nome = "' + str(metric_name) + '"'
-            query = 'INSERT INTO metriche (id, nome, metadata) VALUES ((' + str(id_metric) + '), "' + str(metric_name) +'", "' + str(value) + '") ON DUPLICATE KEY UPDATE metadata = "'+ str(value) + '";'
+            query = 'INSERT INTO metriche (id, nome, metadata) VALUES ((' + str(id_metric) + '), "' + str(metric_name) +'", "' + str(values) + '") ON DUPLICATE KEY UPDATE metadata = "'+ str(values) + '";'
             cursor.execute(query)
             query_result = db.commit()
             if cursor.rowcount != 0 :
