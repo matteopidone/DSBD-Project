@@ -1,6 +1,6 @@
-from time import sleep
-from mysql.connector import MySQLConnection, Error
 import mysql.connector
+from mysql.connector import Error
+from time import sleep
 import os
 import ast
 
@@ -199,5 +199,3 @@ class DataStorageDatabaseClass():
         finally:
             cursor.close()
             db.close()
-
-# Close connection to Database
