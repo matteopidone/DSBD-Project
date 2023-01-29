@@ -7,6 +7,7 @@ sys.path.append('./gRPCUtils')
 import echo_pb2
 import echo_pb2_grpc
 import ast
+import json
 
 app = Flask(__name__)
 
@@ -26,16 +27,18 @@ def template_sla_manager():
 @app.route("/submitSLA", methods=['POST'])
 def submit_sla():
     form_data = manage_data_form(request)
-    with grpc.insecure_channel(os.environ['DATA_STORAGE_GRPC_SERVER']) as channel:
+    with grpc.insecure_channel(os.environ['ETL_DATA_PIPELINE_GRPC_SERVER']) as channel:
         stub = echo_pb2_grpc.EchoServiceStub(channel)
-        result_past_violations = stub.getNumberOfViolationsPast(echo_pb2.listMetricsParam(form_data))
-        result_future_violations = stub.getNumberOfViolationsFuture(echo_pb2.listMetricsParam(form_data))
-        if len(result_past_violations.result) != 0 and len(result_future_violations.result) != 0 :
+        result_past_violations = stub.getNumberOfViolationsPast(echo_pb2.listMetricsParam(listMetrics=json.dumps(form_data)))
+        #result_future_violations = stub.getNumberOfViolationsFuture(echo_pb2.listMetricsParam(listMetrics=json.dumps(form_data)))
+        #result_future_violations = list("pippo", "pluto")
+        #result_past_violations = list(result_past_violations)
+        if len(result_past_violations.result) != 0  :
             past_violations = list(ast.literal_eval(result_past_violations.result))
-            future_violations = list(ast.literal_eval(result_future_violations.result))
-            return render_template('info_sla.html', results=[past_violations, future_violations])
+            #future_violations = list(ast.literal_eval(result_future_violations.result))
+            return render_template('info_sla.html', results=[past_violations])
         else :
-            return "<p>Errore</p>"
+            return "<p>I dati non sono ancora pronti, riprovare più tardi</p>"
 
 """ Other Functions """
 
