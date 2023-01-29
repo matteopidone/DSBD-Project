@@ -60,6 +60,25 @@
             ],
             "primary_key": "PRIMARY KEY (id_metrica, id_statistica)",
             "foreign_key": "FOREIGN KEY (id_metrica) REFERENCES metriche(id), FOREIGN KEY (id_statistica) REFERENCES statistiche(id)"
+        },
+        {
+            "name":"predizioni_metriche",
+            "columns": [
+                {
+                    "name":"id_metrica",
+                    "type":"INT(11) NOT NULL"
+                },
+                {
+                    "name":"id_statistica",
+                    "type":"INT(11) NOT NULL"
+                },
+                {
+                    "name":"valori",
+                    "type":"VARCHAR(512)"
+                }
+            ],
+            "primary_key": "PRIMARY KEY (id_metrica, id_statistica)",
+            "foreign_key": "FOREIGN KEY (id_metrica) REFERENCES metriche(id), FOREIGN KEY (id_statistica) REFERENCES statistiche(id)"
         }
    ]
 }
