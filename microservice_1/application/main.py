@@ -1,5 +1,8 @@
 from prometheus_api_client import PrometheusConnect, MetricRangeDataFrame
 from prometheus_api_client.utils import parse_datetime
+from statsmodels.graphics.tsaplots import acf
+from statsmodels.tsa.stattools import adfuller
+from statsmodels.tsa.seasonal import seasonal_decompose
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
 from MessageProducer import MessageProducerClass
 from LogMonitor import LogMonitorClass
@@ -42,7 +45,8 @@ def main():
             if metricResultQuery['metric']['__name__'] == metric['name']:
                 if is_subset( metric['labels'], metricResultQuery['metric']):
                     init_monitoring_time = time() - time_query_delay
-                    thread_metadata = Thread(target=calculate_metadata_values, args=(init_monitoring_time, metricResultQuery['metric'], metricResultQuery['values']))
+                    metric_values = MetricRangeDataFrame(metricResultQuery)
+                    thread_metadata = Thread(target=calculate_metadata_values, args=(init_monitoring_time, metricResultQuery['metric'], metric_values['value']))
                     thread_metadata.start()
                     break
 
@@ -73,8 +77,9 @@ def main():
 
                 thread_stats = Thread(target=calculate_stats_values, args=(init_monitoring_time, metric, metric_dataframe, interval_time))
                 thread_stats.start()
-                thread_prediction = Thread(target=calculate_prediction_values, args=(init_monitoring_time, metric, metric_dataframe))
-                thread_prediction.start()
+                if interval_time == interval_time_list[-1]:
+                    thread_prediction = Thread(target=calculate_prediction_values, args=(init_monitoring_time, metric, metric_dataframe))
+                    thread_prediction.start()
 
         sleep(sleep_time)
 
@@ -118,6 +123,35 @@ def insert_metrics_on_data_storage(metrics) :
 """ Metadata calculus """
 def calculate_metadata_values(init_monitoring_time, metric_info, values):
 
+    """ Autocorrelazione """
+    acf_result_values = acf(values)
+    acf_result = 0
+    for val in acf_result_values:
+        acf_result += val
+
+    autocorrelation = 'Non è possibile determinarla'
+    if acf_result > 0.6 and acf_result < 1:
+        autocorrelation = 'Serie con correlazione positiva'
+    elif acf_result > 0.2 and acf_result < 0.6:
+        autocorrelation = 'Serie scarsamente correlata positivamente'
+    elif acf_result > -0.2 and acf_result < 0.2:
+        autocorrelation = 'Serie con correlazione nulla'
+    elif acf_result > -0.6 and acf_result < -0.2:
+        autocorrelation = 'Serie scarsamente correlata negativamente'
+    elif acf_result > -1 and acf_result < -0.6:
+        autocorrelation = 'Serie con correlazione negativa'
+
+    """ Stazionarietà """
+    stationarity_test = adfuller(values, autolag='AIC')
+    stationarity = 'false'
+    if stationarity_test[1] <= 0.05:
+        print(metric_info['__name__'] + ' is stationary')
+        stationarity = 'true'
+
+    """ Stagionalità """
+    seasonability = seasonal_decompose(values, model='additive', period=10)
+    seasonality = json.dumps(seasonability.seasonal.tolist())
+
     """ Write Log """
     log_time_seconds = time() - init_monitoring_time
     message = 'Metadata - Metric ' + metric_info['__name__'] + ' took ' + str(round(log_time_seconds)) + ' sec to elaborate data'
@@ -126,11 +160,20 @@ def calculate_metadata_values(init_monitoring_time, metric_info, values):
     data = {
         'name': metric_info['__name__'],
         'type': 'metadata',
-        'values': {
-            'autocorrelazione': 1,
-            'stazionarieta': 4,
-            'stagionalita': 8
-        }
+        'values': [
+            {
+                'name': 'autocorrelazione',
+                'value': autocorrelation
+            },
+            {
+                'name': 'stazionarieta',
+                'value': stationarity
+            },
+            {
+                'name': 'stagionalita',
+                'value': seasonality
+            },
+        ]
     }
 
     message_producer.send_msg(data)
@@ -180,18 +223,27 @@ def calculate_stats_values(init_monitoring_time, metric, metric_dataframe, inter
 def calculate_prediction_values(init_monitoring_time, metric, metric_dataframe):
 
     resampled_data = metric_dataframe['value'].resample(rule='1T')
-
-    avg = resampled_data.mean()
     max = resampled_data.max()
     min = resampled_data.min()
+    avg = resampled_data.mean()
 
-    prediction_max = ExponentialSmoothing(max, trend='add', seasonal='add',seasonal_periods=4).fit()
-    prediction_min = ExponentialSmoothing(min, trend='add', seasonal='add',seasonal_periods=4).fit()
-    prediction_avg = ExponentialSmoothing(avg, trend='add', seasonal='add',seasonal_periods=4).fit() 
+    prediction_max = ExponentialSmoothing(max, trend='add', seasonal='add',seasonal_periods=10).fit()
+    prediction_min = ExponentialSmoothing(min, trend='add', seasonal='add',seasonal_periods=10).fit()
+    prediction_avg = ExponentialSmoothing(avg, trend='add', seasonal='add',seasonal_periods=10).fit() 
 
-    result_max = prediction_max.forecast(10)
-    result_min = prediction_min.forecast(10)
-    result_avg = prediction_avg.forecast(10)
+    result_max = prediction_max.forecast(10).to_dict()
+    result_min = prediction_min.forecast(10).to_dict()
+    result_avg = prediction_avg.forecast(10).to_dict()
+
+    list_max = []
+    list_min = []
+    list_avg = []
+    for key, value in result_max.items():
+        list_max.append((str(key), str(value)))
+    for key, value in result_min.items():
+        list_min.append((str(key), str(value)))
+    for key, value in result_avg.items():
+        list_avg.append((str(key), str(value)))
 
     """ Write Log """
     log_time_seconds = time() - init_monitoring_time
@@ -201,11 +253,20 @@ def calculate_prediction_values(init_monitoring_time, metric, metric_dataframe):
     data = {
         'name': metric['name'],
         'type': 'prediction',
-        'values': {
-            'max': max,
-            'min': min,
-            'avg': avg
-        }
+        'values': [
+            {
+                'name': 'MAX',
+                'value': json.dumps(list_max)
+            },
+            {
+                'name': 'MIN',
+                'value': json.dumps(list_min)
+            },
+            {
+                'name': 'AVG',
+                'value': json.dumps(list_avg)
+            }
+        ]
     }
 
     message_producer.send_msg(data)
