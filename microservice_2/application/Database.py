@@ -83,21 +83,26 @@ class DataStorageDatabaseClass():
         finally:
             cursor.close()
             db.close()
-    
+
     def insert_or_update_prediction(self, metric_name, values) :
         db = self.connect()
         cursor = db.cursor()
         try :
-            cursor.execute()
-            query_result = cursor.fetchone()
-            if query_result :
-                return True
-            else :
-                return False
-        except :
-            print("Error while execute the query")
+            id_metric = 'SELECT id FROM metriche WHERE nome = "' + str(metric_name) + '"'
+            for prediction in values:
+                stat = prediction['name']
+                id_statistic = 'SELECT id FROM statistiche WHERE nome = "' + str(stat) + '"'
+                query = 'INSERT INTO predizioni_metriche (id_metrica, id_statistica, valori) VALUES ((' + str(id_metric) + '), (' + id_statistic + '),' + str(prediction['value']) +') ON DUPLICATE KEY UPDATE valori = '+ str(prediction['value']) +';'
+                cursor.execute(query)
+                db.commit()
+                if cursor.rowcount != 0 :
+                    continue
+                else :
+                    return False
+            return True
+        except Error as e :
+            print("Error while execute the query ", e)
             return False
-            
         finally:
             cursor.close()
             db.close()
