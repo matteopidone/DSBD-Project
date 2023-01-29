@@ -1,10 +1,7 @@
 from flask import Flask, render_template
-import json
-from connect_to_db import connect, close
 import grpc
 import sys
 sys.path.append('./gRPCUtils')
-
 import echo_pb2
 import echo_pb2_grpc
 import ast
@@ -47,8 +44,3 @@ def get_history_for_metrics(id_metric):
             return render_template('metrics_history.html', results=query_result_list)
         else :
             return "<p>Nessuna Metrica al momento è disponibile</p>"
-
-@app.route("/test/json")
-def test_json():
-    return json.dumps(data)
-    #return json.dumps({"key0":"value0", "key_key":{"key1":"value1", "key2":"value2"}})

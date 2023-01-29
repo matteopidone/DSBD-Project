@@ -65,7 +65,6 @@ services:
       mysql:
         condition: service_healthy
     environment:
-      MYSQL_HOST: mysql
       PYTHONUNBUFFERED: 1
     volumes:
       - ./microservice_3/application:/usr/src/application:ro
