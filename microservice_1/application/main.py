@@ -77,8 +77,9 @@ def main():
 
                 thread_stats = Thread(target=calculate_stats_values, args=(init_monitoring_time, metric, metric_dataframe, interval_time))
                 thread_stats.start()
-                thread_prediction = Thread(target=calculate_prediction_values, args=(init_monitoring_time, metric, metric_dataframe))
-                thread_prediction.start()
+                if interval_time == interval_time_list[-1]:
+                    thread_prediction = Thread(target=calculate_prediction_values, args=(init_monitoring_time, metric, metric_dataframe))
+                    thread_prediction.start()
 
         sleep(sleep_time)
 
@@ -123,7 +124,11 @@ def insert_metrics_on_data_storage(metrics) :
 def calculate_metadata_values(init_monitoring_time, metric_info, values):
 
     """ Autocorrelazione """
-    acf_result = acf(values)
+    acf_result_values = acf(values)
+    acf_result = 0
+    for val in acf_result_values:
+        acf_result += val
+
     autocorrelation = 'Non è possibile determinarla'
     if acf_result > 0.6 and acf_result < 1:
         autocorrelation = 'Serie con correlazione positiva'
@@ -214,18 +219,27 @@ def calculate_stats_values(init_monitoring_time, metric, metric_dataframe, inter
 def calculate_prediction_values(init_monitoring_time, metric, metric_dataframe):
 
     resampled_data = metric_dataframe['value'].resample(rule='1T')
-
-    avg = resampled_data.mean()
     max = resampled_data.max()
     min = resampled_data.min()
+    avg = resampled_data.mean()
 
-    prediction_max = ExponentialSmoothing(max, trend='add', seasonal='add',seasonal_periods=4).fit()
-    prediction_min = ExponentialSmoothing(min, trend='add', seasonal='add',seasonal_periods=4).fit()
-    prediction_avg = ExponentialSmoothing(avg, trend='add', seasonal='add',seasonal_periods=4).fit() 
+    prediction_max = ExponentialSmoothing(max, trend='add', seasonal='add',seasonal_periods=10).fit()
+    prediction_min = ExponentialSmoothing(min, trend='add', seasonal='add',seasonal_periods=10).fit()
+    prediction_avg = ExponentialSmoothing(avg, trend='add', seasonal='add',seasonal_periods=10).fit() 
 
-    result_max = prediction_max.forecast(10)
-    result_min = prediction_min.forecast(10)
-    result_avg = prediction_avg.forecast(10)
+    result_max = prediction_max.forecast(10).to_dict()
+    result_min = prediction_min.forecast(10).to_dict()
+    result_avg = prediction_avg.forecast(10).to_dict()
+
+    list_max = []
+    list_min = []
+    list_avg = []
+    for key, value in result_max.items():
+        list_max.append((str(key), str(value)))
+    for key, value in result_min.items():
+        list_min.append((str(key), str(value)))
+    for key, value in result_avg.items():
+        list_avg.append((str(key), str(value)))
 
     """ Write Log """
     log_time_seconds = time() - init_monitoring_time
@@ -235,11 +249,20 @@ def calculate_prediction_values(init_monitoring_time, metric, metric_dataframe):
     data = {
         'name': metric['name'],
         'type': 'prediction',
-        'values': {
-            'max': max,
-            'min': min,
-            'avg': avg
-        }
+        'values': [
+            {
+                'name': 'MAX',
+                'value': json.dumps(list_max)
+            },
+            {
+                'name': 'MIN',
+                'value': json.dumps(list_min)
+            },
+            {
+                'name': 'AVG',
+                'value': json.dumps(list_avg)
+            }
+        ]
     }
 
     message_producer.send_msg(data)
