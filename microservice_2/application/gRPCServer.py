@@ -28,6 +28,8 @@ class EchoService(echo_pb2_grpc.EchoServiceServicer):
         result = db_instance.get_history_for_metrics(id_metric=request.idMetric)
         return echo_pb2.resultValue(result=result)
 
+    """ Function exposed to ETL Data Pipeline """
+
     def sendStats(self, request, context) :
         db_instance = DataStorageDatabaseClass()
         result = db_instance.insert_or_update_stats_conf(stats_list=request.statsName)
