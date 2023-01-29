@@ -58,7 +58,7 @@ class DataStorageDatabaseClass():
             cursor.close()
             db.close()
 
-    """ Other Functions """
+    """ Insert or Update """
 
     def insert_or_update_stats(self, metric_name, value) :
         db = self.connect()
@@ -121,7 +121,9 @@ class DataStorageDatabaseClass():
         finally:
             cursor.close()
             db.close()
-        
+
+    """ Get """
+
     def get_all_metrics(self) :
         db = self.connect()
         cursor = db.cursor()
@@ -190,13 +192,16 @@ class DataStorageDatabaseClass():
             cursor.close()
             db.close()
 
-    def insert_or_update_stats_conf(self, stats_list) :
+    """ Function used to insert configuration data """
+
+    def insert_or_update_metrics_conf(self, metric_list) :
         db = self.connect()
         cursor = db.cursor()
-        stats_list_dict = ast.literal_eval(stats_list)
+        metric_list_dict = ast.literal_eval(metric_list)
+        print(metric_list_dict)
         try :            
-            for stats in stats_list_dict :
-                cursor.execute('INSERT INTO statistiche (nome) VALUES (%s)', (str(stats),))
+            for metric in metric_list_dict :
+                cursor.execute('INSERT INTO metriche (nome) VALUES (%s)', (str(metric),))
                 query_result = db.commit()
                 if cursor.rowcount != 0 :
                     print("Metric inserted")
@@ -212,14 +217,13 @@ class DataStorageDatabaseClass():
             cursor.close()
             db.close()
 
-    def insert_or_update_metrics_conf(self, metric_list) :
+    def insert_or_update_stats_conf(self, stats_list) :
         db = self.connect()
         cursor = db.cursor()
-        metric_list_dict = ast.literal_eval(metric_list)
-        print(metric_list_dict)
+        stats_list_dict = ast.literal_eval(stats_list)
         try :            
-            for metric in metric_list_dict :
-                cursor.execute('INSERT INTO metriche (nome) VALUES (%s)', (str(metric),))
+            for stats in stats_list_dict :
+                cursor.execute('INSERT INTO statistiche (nome) VALUES (%s)', (str(stats),))
                 query_result = db.commit()
                 if cursor.rowcount != 0 :
                     print("Metric inserted")
