@@ -62,7 +62,7 @@ class MetricCalculator :
                     elif( stat['name'] == 'MIN' ) :
                         violation = 0
                         for value in metric['values']:
-                            if value > int(stat['threshold']):
+                            if value < int(stat['threshold']):
                                 violation += 1
                         stat['violations'].append({interval_time: violation})
 
