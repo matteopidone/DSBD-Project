@@ -12,7 +12,7 @@ class EchoService(echo_pb2_grpc.EchoServiceServicer):
         db_instance = DataStorageDatabaseClass()
         result = db_instance.get_all_metrics()
         return echo_pb2.resultValue(result=result)
-    
+
     def getAllStatistics(self, request, context) :
         db_instance = DataStorageDatabaseClass()
         result = db_instance.get_all_statistics()
@@ -27,6 +27,8 @@ class EchoService(echo_pb2_grpc.EchoServiceServicer):
         db_instance = DataStorageDatabaseClass()
         result = db_instance.get_history_for_metrics(id_metric=request.idMetric)
         return echo_pb2.resultValue(result=result)
+
+    """ Function exposed to ETL Data Pipeline """
 
     def sendStats(self, request, context) :
         db_instance = DataStorageDatabaseClass()

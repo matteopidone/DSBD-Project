@@ -1,10 +1,13 @@
-from time import sleep
-from mysql.connector import MySQLConnection, Error
 import mysql.connector
+from mysql.connector import Error
+from time import sleep
 import os
 import ast
+import json
 
 class DataStorageDatabaseClass():
+
+    """ Function to connect to Database """
     def connect(self):
         while True:
             try:
@@ -24,6 +27,38 @@ class DataStorageDatabaseClass():
                 print('Retry sooner...')
 
         return database
+
+    """ Function to Initialize the Database """
+    def init_database(self):
+        try:
+            file = open("../database_schema.json", "r")
+        except FileNotFoundError:
+            print("File not found.")
+
+        data = json.load(file) 
+        file.close()
+
+        db = self.connect()
+        cursor = db.cursor()
+        try :
+            for table in data['tables']:
+                query = "CREATE TABLE " + table['name'] + " ( "
+                for column in table['columns']:
+                    query += column['name'] + " " + column['type'] + ", "
+                query += table['primary_key']
+                if table['foreign_key']:
+                    query += ", " + table['foreign_key']
+                query += " );"
+                cursor.execute(query)
+                print("Table '" + table['name'] + "' created")
+        except Error as e :
+            print("Error while initializing the Database ", e)
+            return False
+        finally:
+            cursor.close()
+            db.close()
+
+    """ Insert or Update """
 
     def insert_or_update_stats(self, metric_name, value) :
         db = self.connect()
@@ -86,7 +121,9 @@ class DataStorageDatabaseClass():
         finally:
             cursor.close()
             db.close()
-        
+
+    """ Get """
+
     def get_all_metrics(self) :
         db = self.connect()
         cursor = db.cursor()
@@ -155,27 +192,7 @@ class DataStorageDatabaseClass():
             cursor.close()
             db.close()
 
-    def insert_or_update_stats_conf(self, stats_list) :
-        db = self.connect()
-        cursor = db.cursor()
-        stats_list_dict = ast.literal_eval(stats_list)
-        try :            
-            for stats in stats_list_dict :
-                cursor.execute('INSERT INTO statistiche (nome) VALUES (%s)', (str(stats),))
-                query_result = db.commit()
-                if cursor.rowcount != 0 :
-                    print("Metric inserted")
-                    continue 
-                else :
-                    print("Metric NOT inserted")
-                    return str(False)
-            return str(True)
-        except Error as e :
-            print("Error while execute the query ", e)
-            return str(False)
-        finally:
-            cursor.close()
-            db.close()
+    """ Function used to insert configuration data """
 
     def insert_or_update_metrics_conf(self, metric_list) :
         db = self.connect()
@@ -200,4 +217,24 @@ class DataStorageDatabaseClass():
             cursor.close()
             db.close()
 
-# Close connection to Database
+    def insert_or_update_stats_conf(self, stats_list) :
+        db = self.connect()
+        cursor = db.cursor()
+        stats_list_dict = ast.literal_eval(stats_list)
+        try :            
+            for stats in stats_list_dict :
+                cursor.execute('INSERT INTO statistiche (nome) VALUES (%s)', (str(stats),))
+                query_result = db.commit()
+                if cursor.rowcount != 0 :
+                    print("Metric inserted")
+                    continue 
+                else :
+                    print("Metric NOT inserted")
+                    return str(False)
+            return str(True)
+        except Error as e :
+            print("Error while execute the query ", e)
+            return str(False)
+        finally:
+            cursor.close()
+            db.close()

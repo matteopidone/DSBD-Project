@@ -15,30 +15,29 @@ class MessageConsumerClass:
         self.db_instance = db_instance
 
     def activate_listener(self):
-        consumer = KafkaConsumer(bootstrap_servers=self.broker,
-                                 group_id='my-group',
-                                 consumer_timeout_ms=60000,
-                                 auto_offset_reset='earliest',
-                                 enable_auto_commit=False,
-                                 value_deserializer=lambda m: json.loads(m.decode('ascii')),
-                                 api_version=(0, 10, 1))
+        consumer = KafkaConsumer(
+            bootstrap_servers=self.broker,
+            group_id=self.group_id,
+            auto_offset_reset='earliest',
+            enable_auto_commit=False,
+            value_deserializer=lambda m: json.loads(m.decode('ascii')),
+            api_version=(0, 10, 1)
+        )
 
         consumer.subscribe(self.topic)
-        print("consumer is listening....")
+        print("Consumer is listening....")
         try:
             for message in consumer:
                 message_received = message.value
-                #print("received message = ", message.value)
-                value = 'Pippo value'
                 if message_received['type'] == 'statistics' :
                     value = self.db_instance.insert_or_update_stats(metric_name = message_received['name'], value = message_received['values'])
-
+                    print("Update statistics: " + str(value))
                 elif message_received['type'] == 'prediction' :
                     value = self.db_instance.insert_or_update_prediction(metric_name = message_received['name'], value = message_received['values'])
-
+                    print("Update prediction: " + str(value))
                 elif message_received['type'] == 'metadata' :
                     value = self.db_instance.insert_or_update_metadata(metric_name = message_received['name'], value = message_received['values'])
-                print("Value " + str(value))
+                    print("Update metadata: " + str(value))
                 consumer.commit()
         except KeyboardInterrupt:
             print("Aborted by user...")
