@@ -1,6 +1,7 @@
 from flask import Flask, render_template
 import grpc
 import sys
+import os
 sys.path.append('./gRPCUtils')
 import echo_pb2
 import echo_pb2_grpc
@@ -10,7 +11,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def get_all_metrics():
-    with grpc.insecure_channel('microservice_2:50051') as channel:
+    with grpc.insecure_channel(os.environ['DATA_STORAGE_GRPC_SERVER']) as channel:
         stub = echo_pb2_grpc.EchoServiceStub(channel)
         query_result = stub.getAllMetrics(echo_pb2.emptyParam())
         if len(query_result.result) != 0 :
@@ -21,7 +22,7 @@ def get_all_metrics():
 
 @app.route("/<id_metric>/metadata")
 def get_metadata_for_metrics(id_metric):
-    with grpc.insecure_channel('microservice_2:50051') as channel:
+    with grpc.insecure_channel(os.environ['DATA_STORAGE_GRPC_SERVER']) as channel:
         stub = echo_pb2_grpc.EchoServiceStub(channel)
         query_result = stub.getMetadataForMetrics(echo_pb2.idMetricParam(idMetric=id_metric))
         if len(query_result.result) != 0 :
@@ -32,7 +33,7 @@ def get_metadata_for_metrics(id_metric):
 
 @app.route("/<id_metric>/history")
 def get_history_for_metrics(id_metric):
-    with grpc.insecure_channel('microservice_2:50051') as channel:
+    with grpc.insecure_channel(os.environ['DATA_STORAGE_GRPC_SERVER']) as channel:
         stub = echo_pb2_grpc.EchoServiceStub(channel)
         query_result = stub.getHistoryForMetrics(echo_pb2.idMetricParam(idMetric=id_metric))
         if len(query_result.result) != 0 :
@@ -43,7 +44,7 @@ def get_history_for_metrics(id_metric):
 
 @app.route("/<id_metric>/prediction")
 def get_prediction_for_metrics(id_metric):
-    with grpc.insecure_channel('microservice_2:50051') as channel:
+    with grpc.insecure_channel(os.environ['DATA_STORAGE_GRPC_SERVER']) as channel:
         stub = echo_pb2_grpc.EchoServiceStub(channel)
         query_result = stub.getPredictionForMetrics(echo_pb2.idMetricParam(idMetric=id_metric))
         if len(query_result.result) != 0 :
