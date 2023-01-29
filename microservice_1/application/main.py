@@ -18,13 +18,13 @@ sys.path.append('./gRPCUtils')
 import echo_pb2
 import echo_pb2_grpc
 from MetricCalculator import MetricCalculator
-from multiprocessing import Process
+from multiprocessing import Process, SimpleQueue
 from gRPCServer import serve
 
 
 """ Main Function """
 
-def main():
+def main(queue):
 
     try:
         file = open("../config.json", "r")
@@ -63,7 +63,8 @@ def main():
 
     """ Start statistics and predictions calculus """
     while True:
-        MetricCalculator.metrics = { '1h': list(), '3h': list(), '12h': list() }
+        d = { '1h': list(), '3h': list(), '12h': list() }
+
         for metric in data['metrics']:
             for interval_time in interval_time_list:
                 
@@ -80,7 +81,7 @@ def main():
                     chunk_size=chunk_size,
                 )
                 metric_dataframe = MetricRangeDataFrame(metric_data)
-                MetricCalculator.metrics[interval_time].append(metric_dataframe)
+                d[interval_time].append({"__name__": metric['name'], 'values': metric_dataframe['value'].tolist()})
 
                 thread_stats = Thread(target=calculate_stats_values, args=(init_monitoring_time, metric, metric_dataframe, interval_time))
                 thread_stats.start()
@@ -90,6 +91,9 @@ def main():
                     thread_prediction = Thread(target=calculate_prediction_values, args=(init_monitoring_time, metric, metric_dataframe))
                     thread_prediction.start()
 
+        print("METRICHE " + str(d))
+        queue.put(str(d))
+        print("go to sleep")
         sleep(sleep_time)
 
 """ Functions """
@@ -115,7 +119,6 @@ def insert_stats_on_data_storage(metrics) :
 
 def insert_metrics_on_data_storage(metrics) :
     print("Waiting grpc server")
-    sleep(20.0)
     metric_to_insert = list()
     for metric in metrics :
         metric_to_insert.append(metric['name'])
@@ -287,7 +290,8 @@ if __name__ == '__main__':
     broker = os.environ['KAFKA_BROKER']
     topic = os.environ['KAFKA_TOPIC']
     message_producer = MessageProducerClass(broker, topic)
+    queue = SimpleQueue()
     log_monitor = LogMonitorClass()
-    p = Process(target=serve, args=[])
+    p = Process(target=serve, args=[queue])
     p.start()
-    main()
+    main(queue)
