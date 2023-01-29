@@ -25,7 +25,6 @@ class DataStorageDatabaseClass():
             except:
                 print('Error during connection : MySQL Host not available')
                 print('Retry sooner...')
-
         return database
 
     """ Function to Initialize the Database """
@@ -145,7 +144,7 @@ class DataStorageDatabaseClass():
         finally:
             cursor.close()
             db.close()
-    
+
     def get_all_statistics(self) :
         db = self.connect()
         cursor = db.cursor()
@@ -179,12 +178,29 @@ class DataStorageDatabaseClass():
         finally:
             cursor.close()
             db.close()
-            
+
     def get_history_for_metrics(self, id_metric) :
         db = self.connect()
         cursor = db.cursor()
         try:
             cursor.execute("SELECT metriche.nome, statistiche.nome, statistiche_metriche.1h, statistiche_metriche.3h, statistiche_metriche.12h FROM metriche JOIN statistiche_metriche ON metriche.id=statistiche_metriche.id_metrica JOIN statistiche on statistiche.id=statistiche_metriche.id_statistica WHERE metriche.id= %s", (id_metric,))
+            query_result = cursor.fetchall()
+            if query_result :
+                return  str(query_result).strip('[]')
+            else :
+                return str()
+        except :
+            print("Error while execute the query")
+            return str()
+        finally:
+            cursor.close()
+            db.close()
+
+    def get_prediction_for_metrics(self, id_metric) :
+        db = self.connect()
+        cursor = db.cursor()
+        try:
+            cursor.execute("SELECT metriche.nome, statistiche.nome, valori FROM metriche JOIN predizioni_metriche ON metriche.id=predizioni_metriche.id_metrica JOIN statistiche on statistiche.id=predizioni_metriche.id_statistica WHERE metriche.id= %s", (id_metric,))
             query_result = cursor.fetchall()
             if query_result :
                 return  str(query_result).strip('[]')
