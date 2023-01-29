@@ -148,6 +148,10 @@ def calculate_metadata_values(init_monitoring_time, metric_info, values):
         print(metric_info['__name__'] + ' is stationary')
         stationarity = 'true'
 
+    """ Stagionalità """
+    seasonability = seasonal_decompose(values, model='additive', period=10)
+    seasonality = json.dumps(seasonability.seasonal.tolist())
+
     """ Write Log """
     log_time_seconds = time() - init_monitoring_time
     message = 'Metadata - Metric ' + metric_info['__name__'] + ' took ' + str(round(log_time_seconds)) + ' sec to elaborate data'
@@ -167,7 +171,7 @@ def calculate_metadata_values(init_monitoring_time, metric_info, values):
             },
             {
                 'name': 'stagionalita',
-                'value': 3
+                'value': seasonality
             },
         ]
     }
