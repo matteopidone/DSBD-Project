@@ -6,10 +6,10 @@
         <div>
             {% for metric in results[0] %}
             <div class="metrics_range_sla_block">
-                <label for="{{ metric }}"><input type="checkbox" id="{{ metric }}" name="metric_name" value="{{ metric }}">&nbsp;{{ metric }}</label>
+                <label for="{{ metric[1] }}"><input type="checkbox" id="{{ metric[1] }}" name="metric_name" value="{{ metric[1] }}">&nbsp;{{ metric[1] }}</label>
                 <div>
                     {% for stat in results[1] %}
-                    <label for="{{ metric }}-{{ stat }}">{{ stat }}&nbsp;<input type="number" id="{{ metric }}-{{ stat }}" name="{{ metric }}-{{ stat }}"></label>
+                    <label for="{{ metric[1] }}-{{ stat[1] }}">{{ stat[1] }}&nbsp;<input type="number" id="{{ metric[1] }}-{{ stat[1] }}" name="{{ metric[1] }}-{{ stat[1] }}"></label>
                     {% endfor %}
                 </div>
             </div>
