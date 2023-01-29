@@ -12,7 +12,7 @@ class EchoService(echo_pb2_grpc.EchoServiceServicer):
         db_instance = DataStorageDatabaseClass()
         result = db_instance.get_all_metrics()
         return echo_pb2.resultValue(result=result)
-    
+
     def getAllStatistics(self, request, context) :
         db_instance = DataStorageDatabaseClass()
         result = db_instance.get_all_statistics()
