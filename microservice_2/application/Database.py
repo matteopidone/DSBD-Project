@@ -3,8 +3,11 @@ from mysql.connector import Error
 from time import sleep
 import os
 import ast
+import json
 
 class DataStorageDatabaseClass():
+
+    """ Function to connect to Database """
     def connect(self):
         while True:
             try:
@@ -24,6 +27,38 @@ class DataStorageDatabaseClass():
                 print('Retry sooner...')
 
         return database
+
+    """ Function to Initialize the Database """
+    def init_database(self):
+        try:
+            file = open("../database_schema.json", "r")
+        except FileNotFoundError:
+            print("File not found.")
+
+        data = json.load(file) 
+        file.close()
+
+        db = self.connect()
+        cursor = db.cursor()
+        try :
+            for table in data['tables']:
+                query = "CREATE TABLE " + table['name'] + " ( "
+                for column in table['columns']:
+                    query += column['name'] + " " + column['type'] + ", "
+                query += table['primary_key']
+                if table['foreign_key']:
+                    query += ", " + table['foreign_key']
+                query += " );"
+                cursor.execute(query)
+                print("Table '" + table['name'] + "' created")
+        except Error as e :
+            print("Error while initializing the Database ", e)
+            return False
+        finally:
+            cursor.close()
+            db.close()
+
+    """ Other Functions """
 
     def insert_or_update_stats(self, metric_name, value) :
         db = self.connect()
