@@ -1,3 +1,4 @@
+import ast
 
 class MetricCalculator :
     ## Variable of the class
@@ -45,37 +46,43 @@ class MetricCalculator :
     ]
 }
 
-    def get_violation_from_all_hour(stat, metric_name) :
-        for interval_time in self.interval_time_list :
-            list_metrics = self.metrics[interval_time]
+    def get_violation_from_all_hour(self, stat, metric_name, all_metrics) :
+        dict_all_metrics = ast.literal_eval(all_metrics)
+        for interval_time in ['1h', '3h', '12h'] :
+            list_metrics = dict_all_metrics[interval_time]
             for metric in list_metrics :
                 if( metric['__name__'] == metric_name ) :
                     if( stat['name'] == 'MAX' ) :
-                        ## calcolo max ad ogni ora
-                        violation = 2
-                        stat['violations'].add(interval_time, violation)
+                        violation = 0
+                        for value in metric['values']:
+                            if value > int(stat['threshold']):
+                                violation += 1
+                        stat['violations'].append({interval_time: violation})
 
                     elif( stat['name'] == 'MIN' ) :
-                        ## calcolo min ad ogni ora
-                        violation = 2
-                        stat['violations'].add(interval_time, violation)
+                        violation = 0
+                        for value in metric['values']:
+                            if value > int(stat['threshold']):
+                                violation += 1
+                        stat['violations'].append({interval_time: violation})
 
-        return stat_to_find
+        return stat
 
-    def get_stats_with_violations(self, stats, metric_name):
+    def get_stats_with_violations(self, stats, metric_name, all_metrics):
         result = list()
         for stat in stats :
-            stat.append('violations', list())
-            stats_new = self.get_violation_from_all_hour(stat, metric_name)
+            stat.update({'violations': []})
+            stats_new = self.get_violation_from_all_hour(stat, metric_name, all_metrics)
             result.append(stats_new)
         return result
 
-    def get_number_violation(self, sla) :
+    def get_number_violation(self, sla, all_metrics) :
         result = list()
-        for metric in sla['sla_metrics'] :
+        dict_sla = ast.literal_eval(sla)
+        for metric in dict_sla['sla_metrics'] :
             metric_set = {}
             metric_set['metric_name'] = metric['metric_name']
-            metric_set['stats'] = self.get_stats_with_violations(metric['stats'], metric['metric_name'])
+            metric_set['stats'] = self.get_stats_with_violations(metric['stats'], metric['metric_name'], all_metrics)
             result.append(metric_set)
         return { "sla_metrics": result }
 
