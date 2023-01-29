@@ -34,9 +34,15 @@ def submit_sla():
         #result_future_violations = list("pippo", "pluto")
         #result_past_violations = list(result_past_violations)
         if len(result_past_violations.result) != 0  :
-            past_violations = list(ast.literal_eval(result_past_violations.result))
+            past_violations = ast.literal_eval(result_past_violations.result)
+            print(past_violations['sla_metrics'])
+            result = []
+            for metric in past_violations['sla_metrics'] :
+                for stat in metric['stats'] :
+                    result.append([metric['metric_name'], stat['name'], stat['threshold'], stat['violations'][0]['1h'], stat['violations'][1]['3h'], stat['violations'][2]['12h']])
+
             #future_violations = list(ast.literal_eval(result_future_violations.result))
-            return render_template('info_sla.html', results=[past_violations])
+            return render_template('info_sla.html', results=result)
         else :
             return "<p>I dati non sono ancora pronti, riprovare più tardi</p>"
 
