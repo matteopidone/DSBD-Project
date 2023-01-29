@@ -1,9 +1,8 @@
 from Database import DataStorageDatabaseClass
-from time import sleep
-import json
 from multiprocessing import Process
 from MessageConsumer import start_consumers 
 from gRPCServer import serve
+import json
 
 """ Main Function """
 def main():
@@ -17,9 +16,13 @@ def main():
 
 """ Function to Initialize the Database """
 def init_database(cursor):
-    # try and catch da inserire
-    file = open("../database_schema.json", "r")
-    data = json.load(file)
+
+    try:
+        file = open("../database_schema.json", "r")
+    except FileNotFoundError:
+        print("File not found.")
+
+    data = json.load(file) 
     file.close()
 
     for table in data['tables']:
