@@ -62,6 +62,7 @@ def main(queue_metrics, queue_predictions):
     """ Start statistics and predictions calculus """
     while True:
         d = { '1h': list(), '3h': list(), '12h': list() }
+        data_predictions = []
 
         for metric in data['metrics']:
             for interval_time in interval_time_list:
@@ -86,11 +87,14 @@ def main(queue_metrics, queue_predictions):
                 
                 # Per la predizione programmaticamente utilizzo l'intervallo di tempo più lungo che ho (l'ultimo della lista).
                 if interval_time == interval_time_list[-1]:
-                    thread_prediction = Thread(target=calculate_prediction_values, args=(init_monitoring_time, metric, metric_dataframe, queue_predictions))
-                    thread_prediction.start()
-
+                    predictions = calculate_prediction_values(init_monitoring_time, metric, metric_dataframe, queue_predictions)
+                    data_predictions.append(predictions)
+        
+        #Inserisco nelle code le metriche e le predizioni che utilizzerà il gRPC server
         print("METRICHE " + str(d))
         queue_metrics.put(str(d))
+        print("Predizioni " + str(data_predictions))
+        queue_predictions.put(str(data_predictions))
         print("go to sleep")
         sleep(sleep_time)
 
@@ -247,12 +251,17 @@ def calculate_prediction_values(init_monitoring_time, metric, metric_dataframe, 
     result_avg = prediction_avg.forecast(10).to_dict()
 
     list_max = []
+    list_max_prediction = []
     list_min = []
+    list_min_prediction = []
     list_avg = []
+    list_avg_prediction = []
     for key, value in result_max.items():
         list_max.append((str(key), str(value)))
+        list_max_prediction.append(str(value))
     for key, value in result_min.items():
         list_min.append((str(key), str(value)))
+        list_min_prediction.append(str(value))
     for key, value in result_avg.items():
         list_avg.append((str(key), str(value)))
 
@@ -262,25 +271,40 @@ def calculate_prediction_values(init_monitoring_time, metric, metric_dataframe, 
     log_monitor.write_log_monitoring(message)
 
     data = {
-        'name': metric['name'],
-        'type': 'prediction',
-        'values': [
+        "name": metric['name'],
+        "type": "prediction",
+        "values": [
             {
-                'name': 'MAX',
-                'value': json.dumps(list_max)
+                "name": "MAX",
+                "value": json.dumps(list_max)
             },
             {
-                'name': 'MIN',
-                'value': json.dumps(list_min)
+                "name": "MIN",
+                "value": json.dumps(list_min)
             },
             {
-                'name': 'AVG',
-                'value': json.dumps(list_avg)
+                "name": "AVG",
+                "value": json.dumps(list_avg)
             }
         ]
     }
-    queue_predictions.put(str(data))
+
+    data_for_calculator = {
+        "name": metric['name'],
+        "type": "prediction",
+        "values": [
+            {
+                "name": "MAX",
+                "value": list_max_prediction
+            },
+            {
+                "name": "MIN",
+                "value": list_min_prediction
+            }
+        ]
+    }
     message_producer.send_msg(data)
+    return data_for_calculator
 
 """ Start Main Script """
 

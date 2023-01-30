@@ -8,7 +8,11 @@ from MetricCalculator import MetricCalculator
 
 class EchoService(echo_pb2_grpc.EchoServiceServicer):
     queue_metrics = ''
-    #message = None
+    queue_predictions = ''
+    message = None
+    message_predictions = None
+
+
     def __init__(self, queue_metrics, queue_predictions) :
         self.queue_metrics = queue_metrics
         self.queue_predictions = queue_predictions
@@ -38,6 +42,7 @@ class EchoService(echo_pb2_grpc.EchoServiceServicer):
         }'''
 
     def getNumberOfViolationsPast(self, request, context) :
+        #Prendo l'ultimo messaggio dalla coda
         while not (self.queue_metrics.empty()) :
             self.message = self.queue_metrics.get()
 
@@ -45,22 +50,21 @@ class EchoService(echo_pb2_grpc.EchoServiceServicer):
         if self.message :
             calculator_instance = MetricCalculator()
             result = calculator_instance.get_number_violation(request.listMetrics, str(self.message))
-            print("Risultato " + str(result))
             return echo_pb2.resultValue(result=str(result))
         else : 
             return echo_pb2.resultValue(result='')
 
     def getNumberOfViolationsFuture(self, request, context) :
-        while not (self.queue_prediction.empty()) :
-            self.message_predictions = self.queue_prediction.get()
+        #Prendo l'ultimo messaggio dalla coda
+        while not (self.queue_predictions.empty()) :
+            self.message_predictions = self.queue_predictions.get()
 
-        #Se l'etl ha prodotto i dati calcolo le violazioni, altrimenti invio messaggio di errore
+        #Se l'etl ha prodotto i dati calcolo le violazioni future, altrimenti invio messaggio di errore
         if self.message_predictions :
             calculator_instance = MetricCalculator()
             result = calculator_instance.get_number_future_violation(request.listMetrics, str(self.message_predictions))
-            print("Risultato " + str(result))
             return echo_pb2.resultValue(result=str(result))
-        else : 
+        else :
             return echo_pb2.resultValue(result='')
     
     
