@@ -27,6 +27,7 @@ def get_metadata_for_metrics(id_metric):
         query_result = stub.getMetadataForMetrics(echo_pb2.idMetricParam(idMetric=id_metric))
         if len(query_result.result) != 0 :
             query_result_list = list(ast.literal_eval(query_result.result))
+            print(query_result_list)
             return render_template('metrics_metadata.html', results=query_result_list)
         else :
             return "<p>Nessuna Metrica al momento è disponibile</p>"

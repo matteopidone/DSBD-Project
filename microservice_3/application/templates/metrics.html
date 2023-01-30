@@ -1,13 +1,20 @@
-<h1 style='text-align: center'>Lista di Metriche</h1>
+<h1 style='text-align: center'>Data Retrieval</h1>
+<h2 style='text-align: center'>Metriche</h2>
 <table>
     <tr>
         <th>ID Metrica</th>
         <th>Nome Metrica</th>
+        <th>Metadati</th>
+        <th>Statistiche</th>
+        <th>Predizioni</th>
     </tr>
     {% for row in results %}
       <tr>
          <td>{{ row[0] }}</td>
          <td>{{ row[1] }}</td>
+         <td><a target="_self" href="/{{ row[0] }}/metadata">HERE</a></td>
+         <td><a target="_self" href="/{{ row[0] }}/history">HERE</a></td>
+         <td><a target="_self" href="/{{ row[0] }}/prediction">HERE</a></td>
       </tr>
     {% endfor %}
 </table>
