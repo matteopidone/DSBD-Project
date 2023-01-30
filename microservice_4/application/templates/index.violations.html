@@ -1,0 +1,60 @@
+<h1 class="microservice_title">SLA Manager - Predizione delle violazioni</h1>
+<body>
+    <form action="submitViolations" method="post">
+        <label for="select">Seleziona le metriche da inserire in un SLA:</label>
+        
+        <div>
+            {% for metric in results[0] %}
+            <div class="metrics_range_sla_block">
+                <label for="{{ metric[1] }}"><input type="checkbox" id="{{ metric[1] }}" name="metric_name" value="{{ metric[1] }}">&nbsp;{{ metric[1] }}</label>
+                <div>
+                    {% for stat in results[1] %}
+                    <label for="{{ metric[1] }}-{{ stat[1] }}">{{ stat[1] }}&nbsp;<input type="number" id="{{ metric[1] }}-{{ stat[1] }}" name="{{ metric[1] }}-{{ stat[1] }}"></label>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <input type="submit" value="Conferma">
+    </form>
+</body>
+
+<style>
+body {
+    font-size: 25px;
+}
+
+form {
+    width: 35%;
+    min-width: max-content;
+    margin: 50px;
+    padding: 15px;
+    border: 2px solid;
+}
+
+label {
+    max-width: max-content;
+}
+
+input[type=number] {
+    width: 100px;
+}
+
+input[type=submit] {
+    font-size: 20px;
+}
+
+/* Classes */
+
+.microservice_title {
+    font-size: 50px;
+    text-align: center;
+}
+
+.metrics_range_sla_block {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 10px;
+}
+</style>
