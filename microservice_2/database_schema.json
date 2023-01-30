@@ -13,7 +13,7 @@
                 },
                 {
                     "name":"metadata",
-                    "type":"VARCHAR(512)"
+                    "type":"TEXT"
                 }
             ],
             "primary_key": "PRIMARY KEY (id)",
@@ -47,15 +47,15 @@
                 },
                 {
                     "name":"1h",
-                    "type":"INT(20)"
+                    "type":"BIGINT"
                 },
                 {
                     "name":"3h",
-                    "type":"INT(20)"
+                    "type":"BIGINT"
                 },
                 {
                     "name":"12h",
-                    "type":"INT(20)"
+                    "type":"BIGINT"
                 }
             ],
             "primary_key": "PRIMARY KEY (id_metrica, id_statistica)",
@@ -74,7 +74,7 @@
                 },
                 {
                     "name":"valori",
-                    "type":"VARCHAR(512)"
+                    "type":"TEXT"
                 }
             ],
             "primary_key": "PRIMARY KEY (id_metrica, id_statistica)",

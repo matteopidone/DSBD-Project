@@ -68,7 +68,6 @@ class DataStorageDatabaseClass():
                 id_metric = 'SELECT id FROM metriche WHERE nome = "' + str(metric_name) + '"'
                 id_statistics = 'SELECT id FROM statistiche WHERE nome = "' + str(stats['name']) + '"'
                 query = 'INSERT INTO statistiche_metriche (id_metrica, id_statistica,' + str(time) + ') VALUES ((' + str(id_metric) + '), (' + id_statistics + '),' + str(stats['value']) +') ON DUPLICATE KEY UPDATE ' + str(time) + ' = '+ str(stats['value']) +';'
-                
                 cursor.execute(query)
                 query_result = db.commit()
                 if cursor.rowcount != 0 :
@@ -91,7 +90,8 @@ class DataStorageDatabaseClass():
             for prediction in values:
                 stat = prediction['name']
                 id_statistic = 'SELECT id FROM statistiche WHERE nome = "' + str(stat) + '"'
-                query = 'INSERT INTO predizioni_metriche (id_metrica, id_statistica, valori) VALUES ((' + str(id_metric) + '), (' + id_statistic + '),' + str(prediction['value']) +') ON DUPLICATE KEY UPDATE valori = '+ str(prediction['value']) +';'
+                prediction_value = str(prediction['value']).replace('"', "'")
+                query = 'INSERT INTO predizioni_metriche (id_metrica, id_statistica, valori) VALUES ((' + str(id_metric) + '), (' + str(id_statistic) + '), "' + prediction_value +'") ON DUPLICATE KEY UPDATE valori = "'+ prediction_value +'";'
                 cursor.execute(query)
                 db.commit()
                 if cursor.rowcount != 0 :
@@ -247,10 +247,10 @@ class DataStorageDatabaseClass():
                 cursor.execute('INSERT INTO statistiche (nome) VALUES (%s)', (str(stats),))
                 query_result = db.commit()
                 if cursor.rowcount != 0 :
-                    print("Metric inserted")
+                    print("Statistic inserted")
                     continue 
                 else :
-                    print("Metric NOT inserted")
+                    print("Statistic NOT inserted")
                     return str(False)
             return str(True)
         except Error as e :
