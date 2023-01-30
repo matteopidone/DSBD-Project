@@ -8,6 +8,7 @@ service EchoService {
   rpc getHistoryForMetrics (idMetricParam) returns (resultValue) {}
   rpc sendStats (statsNameParam) returns (resultValue) {}
   rpc sendMetrics (statsNameParam) returns (resultValue) {}
+  rpc getPredictionForMetrics(idMetricParam) returns (resultValue) {}
 }
 
 message idMetricParam {
