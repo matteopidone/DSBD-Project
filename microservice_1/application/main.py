@@ -129,7 +129,7 @@ def calculate_metadata_values(init_monitoring_time, metric_info, values):
     for val in acf_result_values:
         acf_result += val
 
-    autocorrelation = 'Non è possibile determinarla'
+    autocorrelation = "Errore calcolo autocorrelazione"
     if acf_result > 0.6 and acf_result < 1:
         autocorrelation = 'Serie con correlazione positiva'
     elif acf_result > 0.2 and acf_result < 0.6:
@@ -150,7 +150,8 @@ def calculate_metadata_values(init_monitoring_time, metric_info, values):
 
     """ Stagionalità """
     seasonability = seasonal_decompose(values, model='additive', period=10)
-    seasonality = json.dumps(seasonability.seasonal.tolist())
+    season_list = seasonability.seasonal.tolist()
+    seasonality = json.dumps(season_list[0:120])
 
     """ Write Log """
     log_time_seconds = time() - init_monitoring_time
