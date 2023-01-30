@@ -1,13 +1,14 @@
 <h1 style='text-align: center'>Data Retrieval</h1>
-<h2 style='text-align: center'>Predizioni</h2>
-<table>
+<h2 style='text-align: center'>Predizioni : {{ results[0][0] }}</h2>
+<table style="margin: 30px auto;font-size: 20px;">
     {% for row in results %}
     <tr>
         <td>{{ row[1] }}</td>
         <td>{{ row[2] }}</td>
-        <td>{{ row[3] }}</td>
-        <td>{{ row[4] }}</td>
     </tr>
     {% endfor %}
 </table>
-<a target="_self" href="/">HOME</a>
+
+<div style="text-align: center">
+    <a target="_self" href="/" style="font-size: 30px">HOME</a>
+</div>
