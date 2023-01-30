@@ -24,7 +24,7 @@ from gRPCServer import serve
 
 """ Main Function """
 
-def main(queue):
+def main(queue_metrics, queue_predictions):
 
     try:
         file = open("../config.json", "r")
@@ -38,7 +38,6 @@ def main(queue):
     insert_metrics_on_data_storage(data['metrics'])
 
     prom = PrometheusConnect(url=os.environ['PROMETHEUS_SERVER'], disable_ssl=True)
-    
     """ Start metadata calculus """
     init_time = time()
     queryResult = prom.custom_query(query='{job="' + data['job'] +'"}[' + data['range_time'] +']')
@@ -53,7 +52,6 @@ def main(queue):
                     thread_metadata = Thread(target=calculate_metadata_values, args=(init_monitoring_time, metricResultQuery['metric'], metric_values['value']))
                     thread_metadata.start()
                     break
-
     sleep_time = 600
     if os.environ.get('INTERVAL_TIME_SECONDS'):
         sleep_time = int(os.environ['INTERVAL_TIME_SECONDS'])
@@ -88,11 +86,11 @@ def main(queue):
                 
                 # Per la predizione programmaticamente utilizzo l'intervallo di tempo più lungo che ho (l'ultimo della lista).
                 if interval_time == interval_time_list[-1]:
-                    thread_prediction = Thread(target=calculate_prediction_values, args=(init_monitoring_time, metric, metric_dataframe))
+                    thread_prediction = Thread(target=calculate_prediction_values, args=(init_monitoring_time, metric, metric_dataframe, queue_predictions))
                     thread_prediction.start()
 
         print("METRICHE " + str(d))
-        queue.put(str(d))
+        queue_metrics.put(str(d))
         print("go to sleep")
         sleep(sleep_time)
 
@@ -233,7 +231,7 @@ def calculate_stats_values(init_monitoring_time, metric, metric_dataframe, inter
     message_producer.send_msg(data)
 
 """ Predictions calculus """
-def calculate_prediction_values(init_monitoring_time, metric, metric_dataframe):
+def calculate_prediction_values(init_monitoring_time, metric, metric_dataframe, queue_predictions):
 
     resampled_data = metric_dataframe['value'].resample(rule='1T')
     max = resampled_data.max()
@@ -281,7 +279,7 @@ def calculate_prediction_values(init_monitoring_time, metric, metric_dataframe):
             }
         ]
     }
-
+    queue_predictions.put(str(data))
     message_producer.send_msg(data)
 
 """ Start Main Script """
@@ -290,8 +288,11 @@ if __name__ == '__main__':
     broker = os.environ['KAFKA_BROKER']
     topic = os.environ['KAFKA_TOPIC']
     message_producer = MessageProducerClass(broker, topic)
-    queue = SimpleQueue()
+    #Queue che conterrà le metriche, permette la comunicazione tra questo processo ed il processo gRPC
+    queue_metrics = SimpleQueue()
+    #Queue che conterrà le predizioni, permette la comunicazione tra questo processo ed il processo gRPC
+    queue_predictions = SimpleQueue()
     log_monitor = LogMonitorClass()
-    p = Process(target=serve, args=[queue])
+    p = Process(target=serve, args=[queue_metrics, queue_predictions])
     p.start()
-    main(queue)
+    main(queue_metrics, queue_predictions)
