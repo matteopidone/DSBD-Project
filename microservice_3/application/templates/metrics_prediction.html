@@ -1,9 +1,13 @@
-<h1 style='text-align: center'>Lista di Predizioni per {{ results[0] }}</h1>
+<h1 style='text-align: center'>Data Retrieval</h1>
+<h2 style='text-align: center'>Predizioni</h2>
 <table>
+    {% for row in results %}
     <tr>
-        <th>Metadati</th>
+        <td>{{ row[1] }}</td>
+        <td>{{ row[2] }}</td>
+        <td>{{ row[3] }}</td>
+        <td>{{ row[4] }}</td>
     </tr>
-    <tr>
-        <td>{{ results[1] }}</td>
-    </tr>
+    {% endfor %}
 </table>
+<a target="_self" href="/">HOME</a>
