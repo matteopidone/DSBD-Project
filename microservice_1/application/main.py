@@ -24,7 +24,7 @@ from gRPCServer import serve
 
 """ Main Function """
 
-def main(queue_metrics, queue_predictions):
+def main(queue_metrics, queue_predictions, message_producer):
 
     try:
         file = open("../config.json", "r")
@@ -36,6 +36,9 @@ def main(queue_metrics, queue_predictions):
     
     insert_stats_on_data_storage(data['stats'])
     insert_metrics_on_data_storage(data['metrics'])
+    
+    #Creo un topic con tante partizioni tante quante sono le metriche
+    message_producer.create_topic(len(data['metrics']))
 
     prom = PrometheusConnect(url=os.environ['PROMETHEUS_SERVER'], disable_ssl=True)
     """ Start metadata calculus """
@@ -49,7 +52,7 @@ def main(queue_metrics, queue_predictions):
                 if is_subset( metric['labels'], metricResultQuery['metric']):
                     init_monitoring_time = time() - time_query_delay
                     metric_values = MetricRangeDataFrame(metricResultQuery)
-                    thread_metadata = Thread(target=calculate_metadata_values, args=(init_monitoring_time, metricResultQuery['metric'], metric_values['value']))
+                    thread_metadata = Thread(target=calculate_metadata_values, args=(init_monitoring_time, metricResultQuery['metric'], metric_values['value'], data['metrics'].index(metric)))
                     thread_metadata.start()
                     break
     sleep_time = 600
@@ -82,11 +85,12 @@ def main(queue_metrics, queue_predictions):
                 metric_dataframe = MetricRangeDataFrame(metric_data)
                 d[interval_time].append({"__name__": metric['name'], 'values': metric_dataframe['value'].tolist()})
 
-                thread_stats = Thread(target=calculate_stats_values, args=(init_monitoring_time, metric, metric_dataframe, interval_time))
+                thread_stats = Thread(target=calculate_stats_values, args=(init_monitoring_time, metric, metric_dataframe, interval_time, data['metrics'].index(metric)))
                 thread_stats.start()
                 
                 # Per la predizione programmaticamente utilizzo l'intervallo di tempo più lungo che ho (l'ultimo della lista).
                 if interval_time == interval_time_list[-1]:
+<<<<<<< HEAD
                     predictions = calculate_prediction_values(init_monitoring_time, metric, metric_dataframe, queue_predictions)
                     data_predictions.append(predictions)
         
@@ -96,6 +100,11 @@ def main(queue_metrics, queue_predictions):
         print("Predizioni " + str(data_predictions))
         queue_predictions.put(str(data_predictions))
         print("go to sleep")
+=======
+                    thread_prediction = Thread(target=calculate_prediction_values, args=(init_monitoring_time, metric, metric_dataframe, data['metrics'].index(metric)))
+                    thread_prediction.start()
+
+>>>>>>> f0e4f20 (feat(microservice 1): parametrizzo la creazione di partizioni e l'invio)
         sleep(sleep_time)
 
 """ Functions """
@@ -135,7 +144,7 @@ def insert_metrics_on_data_storage(metrics) :
 
 
 """ Metadata calculus """
-def calculate_metadata_values(init_monitoring_time, metric_info, values):
+def calculate_metadata_values(init_monitoring_time, metric_info, values, offset_partition):
 
     """ Autocorrelazione """
     acf_result_values = acf(values)
@@ -191,10 +200,10 @@ def calculate_metadata_values(init_monitoring_time, metric_info, values):
         ]
     }
 
-    message_producer.send_msg(data)
+    message_producer.send_msg(data, offset_partition) #inviare alla partizione corretta dato l'indice del file di config
 
 """ Statistics calculus """
-def calculate_stats_values(init_monitoring_time, metric, metric_dataframe, interval_time):
+def calculate_stats_values(init_monitoring_time, metric, metric_dataframe, interval_time, offset_partition):
 
     max = round(metric_dataframe['value'].max())
     min = round(metric_dataframe['value'].min())
@@ -232,10 +241,15 @@ def calculate_stats_values(init_monitoring_time, metric, metric_dataframe, inter
         }
     }
 
-    message_producer.send_msg(data)
+    message_producer.send_msg(data, offset_partition) #inviare alla partizione corretta dato l'indice del file di config
+
 
 """ Predictions calculus """
+<<<<<<< HEAD
 def calculate_prediction_values(init_monitoring_time, metric, metric_dataframe, queue_predictions):
+=======
+def calculate_prediction_values(init_monitoring_time, metric, metric_dataframe, offset_partition):
+>>>>>>> f0e4f20 (feat(microservice 1): parametrizzo la creazione di partizioni e l'invio)
 
     resampled_data = metric_dataframe['value'].resample(rule='1T')
     max = resampled_data.max()
@@ -289,6 +303,7 @@ def calculate_prediction_values(init_monitoring_time, metric, metric_dataframe, 
         ]
     }
 
+<<<<<<< HEAD
     data_for_calculator = {
         'name': metric['name'],
         'type': 'prediction',
@@ -305,6 +320,10 @@ def calculate_prediction_values(init_monitoring_time, metric, metric_dataframe, 
     }
     message_producer.send_msg(data)
     return data_for_calculator
+=======
+    message_producer.send_msg(data, offset_partition) #inviare alla partizione corretta dato l'indice del file di config
+
+>>>>>>> f0e4f20 (feat(microservice 1): parametrizzo la creazione di partizioni e l'invio)
 
 """ Start Main Script """
 
@@ -317,6 +336,10 @@ if __name__ == '__main__':
     #Queue che conterrà le predizioni, permette la comunicazione tra questo processo ed il processo gRPC
     queue_predictions = SimpleQueue()
     log_monitor = LogMonitorClass()
+<<<<<<< HEAD
     p = Process(target=serve, args=[queue_metrics, queue_predictions])
     p.start()
     main(queue_metrics, queue_predictions)
+=======
+    main(message_producer)
+>>>>>>> f0e4f20 (feat(microservice 1): parametrizzo la creazione di partizioni e l'invio)
