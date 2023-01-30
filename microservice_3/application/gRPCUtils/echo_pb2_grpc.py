@@ -29,6 +29,11 @@ class EchoServiceStub(object):
                 request_serializer=echo__pb2.idMetricParam.SerializeToString,
                 response_deserializer=echo__pb2.resultValue.FromString,
                 )
+        self.getPredictionForMetrics = channel.unary_unary(
+                '/echo.EchoService/getPredictionForMetrics',
+                request_serializer=echo__pb2.idMetricParam.SerializeToString,
+                response_deserializer=echo__pb2.resultValue.FromString,
+                )
 
 
 class EchoServiceServicer(object):
@@ -52,6 +57,12 @@ class EchoServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def getPredictionForMetrics(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_EchoServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -67,6 +78,11 @@ def add_EchoServiceServicer_to_server(servicer, server):
             ),
             'getHistoryForMetrics': grpc.unary_unary_rpc_method_handler(
                     servicer.getHistoryForMetrics,
+                    request_deserializer=echo__pb2.idMetricParam.FromString,
+                    response_serializer=echo__pb2.resultValue.SerializeToString,
+            ),
+            'getPredictionForMetrics': grpc.unary_unary_rpc_method_handler(
+                    servicer.getPredictionForMetrics,
                     request_deserializer=echo__pb2.idMetricParam.FromString,
                     response_serializer=echo__pb2.resultValue.SerializeToString,
             ),
@@ -126,6 +142,23 @@ class EchoService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/echo.EchoService/getHistoryForMetrics',
+            echo__pb2.idMetricParam.SerializeToString,
+            echo__pb2.resultValue.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def getPredictionForMetrics(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/echo.EchoService/getPredictionForMetrics',
             echo__pb2.idMetricParam.SerializeToString,
             echo__pb2.resultValue.FromString,
             options, channel_credentials,
