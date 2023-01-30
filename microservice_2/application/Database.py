@@ -25,7 +25,6 @@ class DataStorageDatabaseClass():
             except:
                 print('Error during connection : MySQL Host not available')
                 print('Retry sooner...')
-
         return database
 
     """ Function to Initialize the Database """
@@ -60,16 +59,15 @@ class DataStorageDatabaseClass():
 
     """ Insert or Update """
 
-    def insert_or_update_stats(self, metric_name, value) :
+    def insert_or_update_stats(self, metric_name, values) :
         db = self.connect()
         cursor = db.cursor()
         try :
-            time = value['time']
-            for stats in value['stats'] :
+            time = values['time']
+            for stats in values['stats'] :
                 id_metric = 'SELECT id FROM metriche WHERE nome = "' + str(metric_name) + '"'
                 id_statistics = 'SELECT id FROM statistiche WHERE nome = "' + str(stats['name']) + '"'
                 query = 'INSERT INTO statistiche_metriche (id_metrica, id_statistica,' + str(time) + ') VALUES ((' + str(id_metric) + '), (' + id_statistics + '),' + str(stats['value']) +') ON DUPLICATE KEY UPDATE ' + str(time) + ' = '+ str(stats['value']) +';'
-                
                 cursor.execute(query)
                 query_result = db.commit()
                 if cursor.rowcount != 0 :
@@ -83,31 +81,37 @@ class DataStorageDatabaseClass():
         finally:
             cursor.close()
             db.close()
-    
-    def insert_or_update_prediction(self, metric_name, value) :
+
+    def insert_or_update_prediction(self, metric_name, values) :
         db = self.connect()
         cursor = db.cursor()
         try :
-            cursor.execute()
-            query_result = cursor.fetchone()
-            if query_result :
-                return True
-            else :
-                return False
-        except :
-            print("Error while execute the query")
+            id_metric = 'SELECT id FROM metriche WHERE nome = "' + str(metric_name) + '"'
+            for prediction in values:
+                stat = prediction['name']
+                id_statistic = 'SELECT id FROM statistiche WHERE nome = "' + str(stat) + '"'
+                prediction_value = str(prediction['value']).replace('"', "'")
+                query = 'INSERT INTO predizioni_metriche (id_metrica, id_statistica, valori) VALUES ((' + str(id_metric) + '), (' + str(id_statistic) + '), "' + prediction_value +'") ON DUPLICATE KEY UPDATE valori = "'+ prediction_value +'";'
+                cursor.execute(query)
+                db.commit()
+                if cursor.rowcount != 0 :
+                    continue
+                else :
+                    return False
+            return True
+        except Error as e :
+            print("Error while execute the query ", e)
             return False
-            
         finally:
             cursor.close()
             db.close()
 
-    def insert_or_update_metadata(self, metric_name, value) :
+    def insert_or_update_metadata(self, metric_name, values) :
         db = self.connect()
         cursor = db.cursor()
         try :
             id_metric = 'SELECT m2.id FROM metriche AS m2 WHERE m2.nome = "' + str(metric_name) + '"'
-            query = 'INSERT INTO metriche (id, nome, metadata) VALUES ((' + str(id_metric) + '), "' + str(metric_name) +'", "' + str(value) + '") ON DUPLICATE KEY UPDATE metadata = "'+ str(value) + '";'
+            query = 'INSERT INTO metriche (id, nome, metadata) VALUES ((' + str(id_metric) + '), "' + str(metric_name) +'", "' + str(values) + '") ON DUPLICATE KEY UPDATE metadata = "'+ str(values) + '";'
             cursor.execute(query)
             query_result = db.commit()
             if cursor.rowcount != 0 :
@@ -140,7 +144,7 @@ class DataStorageDatabaseClass():
         finally:
             cursor.close()
             db.close()
-    
+
     def get_all_statistics(self) :
         db = self.connect()
         cursor = db.cursor()
@@ -174,12 +178,29 @@ class DataStorageDatabaseClass():
         finally:
             cursor.close()
             db.close()
-            
+
     def get_history_for_metrics(self, id_metric) :
         db = self.connect()
         cursor = db.cursor()
         try:
             cursor.execute("SELECT metriche.nome, statistiche.nome, statistiche_metriche.1h, statistiche_metriche.3h, statistiche_metriche.12h FROM metriche JOIN statistiche_metriche ON metriche.id=statistiche_metriche.id_metrica JOIN statistiche on statistiche.id=statistiche_metriche.id_statistica WHERE metriche.id= %s", (id_metric,))
+            query_result = cursor.fetchall()
+            if query_result :
+                return  str(query_result).strip('[]')
+            else :
+                return str()
+        except :
+            print("Error while execute the query")
+            return str()
+        finally:
+            cursor.close()
+            db.close()
+
+    def get_prediction_for_metrics(self, id_metric) :
+        db = self.connect()
+        cursor = db.cursor()
+        try:
+            cursor.execute("SELECT metriche.nome, statistiche.nome, valori FROM metriche JOIN predizioni_metriche ON metriche.id=predizioni_metriche.id_metrica JOIN statistiche on statistiche.id=predizioni_metriche.id_statistica WHERE metriche.id= %s", (id_metric,))
             query_result = cursor.fetchall()
             if query_result :
                 return  str(query_result).strip('[]')
@@ -226,10 +247,10 @@ class DataStorageDatabaseClass():
                 cursor.execute('INSERT INTO statistiche (nome) VALUES (%s)', (str(stats),))
                 query_result = db.commit()
                 if cursor.rowcount != 0 :
-                    print("Metric inserted")
+                    print("Statistic inserted")
                     continue 
                 else :
-                    print("Metric NOT inserted")
+                    print("Statistic NOT inserted")
                     return str(False)
             return str(True)
         except Error as e :

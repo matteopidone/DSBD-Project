@@ -30,13 +30,13 @@ class MessageConsumerClass:
             for message in consumer:
                 message_received = message.value
                 if message_received['type'] == 'statistics' :
-                    value = self.db_instance.insert_or_update_stats(metric_name = message_received['name'], value = message_received['values'])
+                    value = self.db_instance.insert_or_update_stats(metric_name = message_received['name'], values = message_received['values'])
                     print("Update statistics: " + str(value))
                 elif message_received['type'] == 'prediction' :
-                    value = self.db_instance.insert_or_update_prediction(metric_name = message_received['name'], value = message_received['values'])
+                    value = self.db_instance.insert_or_update_prediction(metric_name = message_received['name'], values = message_received['values'])
                     print("Update prediction: " + str(value))
                 elif message_received['type'] == 'metadata' :
-                    value = self.db_instance.insert_or_update_metadata(metric_name = message_received['name'], value = message_received['values'])
+                    value = self.db_instance.insert_or_update_metadata(metric_name = message_received['name'], values = message_received['values'])
                     print("Update metadata: " + str(value))
                 consumer.commit()
         except KeyboardInterrupt:
