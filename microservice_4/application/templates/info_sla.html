@@ -1,14 +1,29 @@
-<h1 class="microservice_title">SLA Manager</h1>
+<h1 class="microservice_title">SLA Manager - Violazioni SLA </h1>
 <body>
-
-    {% for x in results[0] %}
-    <p>x</p>
-    {% endfor %}
-    <h2>-----</h2>
-    {% for x in results[1] %}
-    <p>x</p>
-    {% endfor %}
-
+    <table>
+        <tr>
+            <th>Nome Metrica</th>
+            <th>Nome dato</th>
+            <th>Soglia</th>
+            <th>Violazione 1h</th>
+            <th>Violazione 3h</th>
+            <th>Violazione 12h</th>
+        </tr>
+        {% for row in results %}
+        <tr>
+            <td>{{ row[0] }}</td>
+            <td>{{ row[1] }}</td>
+            <td>{{ row[2] }}</td>
+            <td>{{ row[3] }}</td>
+            <td>{{ row[4] }}</td>
+            <td>{{ row[5] }}</td>
+            <td>{{ row[6] }}</td>
+            <td>{{ row[7] }}</td>
+            <td>{{ row[8] }}</td>
+            <td>{{ row[9] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
 </body>
 
 <style>

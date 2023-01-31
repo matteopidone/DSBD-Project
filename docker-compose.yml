@@ -30,6 +30,7 @@ services:
       - type: bind
         source: ./microservice_1/application/log
         target: /usr/src/application/log/
+      - ./microservice_1/application:/usr/src/application:ro
 
   microservice_2:
     image: data_storage
@@ -48,6 +49,8 @@ services:
       KAFKA_TOPIC: prometheusdata
       MYSQL_HOST: mysql
       PYTHONUNBUFFERED: 1
+    volumes:
+      - ./microservice_2/application:/usr/src/application:ro
 
   microservice_3:
     image: data_retrieval
@@ -64,6 +67,8 @@ services:
     environment:
       MYSQL_HOST: mysql
       PYTHONUNBUFFERED: 1
+    volumes:
+      - ./microservice_3/application:/usr/src/application:ro
 
   microservice_4:
     image: sla_manager
@@ -76,7 +81,10 @@ services:
     restart: always
     environment:
       DATA_STORAGE_GRPC_SERVER: microservice_2:50051
+      ETL_DATA_PIPELINE_GRPC_SERVER: microservice_1:50051
       PYTHONUNBUFFERED: 1
+    volumes:
+      - ./microservice_4/application:/usr/src/application:ro
 
   mysql:
     image: mysql:latest

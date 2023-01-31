@@ -19,9 +19,3 @@ class resultValue(_message.Message):
     RESULT_FIELD_NUMBER: _ClassVar[int]
     result: str
     def __init__(self, result: _Optional[str] = ...) -> None: ...
-
-class statsNameParam(_message.Message):
-    __slots__ = ["statsName"]
-    STATSNAME_FIELD_NUMBER: _ClassVar[int]
-    statsName: str
-    def __init__(self, statsName: _Optional[str] = ...) -> None: ...

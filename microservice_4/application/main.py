@@ -7,6 +7,7 @@ sys.path.append('./gRPCUtils')
 import echo_pb2
 import echo_pb2_grpc
 import ast
+import json
 
 app = Flask(__name__)
 
@@ -19,23 +20,75 @@ def template_sla_manager():
         if len(query_result_metrics.result) != 0 and len(query_result_stats.result) != 0 :
             list_metrics = list(ast.literal_eval(query_result_metrics.result))
             list_stats = list(ast.literal_eval(query_result_stats.result))
-            return render_template('index.html', results=[list_metrics, list_stats])
+            list_stats_result = []
+            
+            for stat in list_stats :
+                if(stat[1] != 'MAX' and stat[1] != 'MIN'):
+                    continue
+                else :
+                    list_stats_result.append(stat)
+
+            return render_template('index.html', results=[list_metrics, list_stats_result])
         else :
             return "<p>Nessuna Metrica al momento è disponibile</p>"
 
 @app.route("/submitSLA", methods=['POST'])
 def submit_sla():
     form_data = manage_data_form(request)
+    with grpc.insecure_channel(os.environ['ETL_DATA_PIPELINE_GRPC_SERVER']) as channel:
+        stub = echo_pb2_grpc.EchoServiceStub(channel)
+        result_past_violations = stub.getNumberOfViolationsPast(echo_pb2.listMetricsParam(listMetrics=json.dumps(form_data)))
+        if len(result_past_violations.result) != 0  :
+            past_violations = ast.literal_eval(result_past_violations.result)
+            print(past_violations['sla_metrics'])
+            result = []
+            for metric in past_violations['sla_metrics'] :
+                for stat in metric['stats'] :
+                    result.append([metric['metric_name'], stat['name'], stat['threshold'], stat['violations'][0]['1h'], stat['violations'][1]['3h'], stat['violations'][2]['12h']])
+
+            return render_template('info_sla.html', results=result)
+        else :
+            return "<p>I dati non sono ancora pronti, riprovare più tardi</p>"
+
+@app.route("/violation")
+def template_violation_prediction():
     with grpc.insecure_channel(os.environ['DATA_STORAGE_GRPC_SERVER']) as channel:
         stub = echo_pb2_grpc.EchoServiceStub(channel)
-        result_past_violations = stub.getNumberOfViolationsPast(echo_pb2.listMetricsParam(form_data))
-        result_future_violations = stub.getNumberOfViolationsFuture(echo_pb2.listMetricsParam(form_data))
-        if len(result_past_violations.result) != 0 and len(result_future_violations.result) != 0 :
-            past_violations = list(ast.literal_eval(result_past_violations.result))
-            future_violations = list(ast.literal_eval(result_future_violations.result))
-            return render_template('info_sla.html', results=[past_violations, future_violations])
+        query_result_metrics = stub.getAllMetrics(echo_pb2.emptyParam())
+        query_result_stats = stub.getAllStatistics(echo_pb2.emptyParam())
+        if len(query_result_metrics.result) != 0 and len(query_result_stats.result) != 0 :
+            list_metrics = list(ast.literal_eval(query_result_metrics.result))
+            list_stats = list(ast.literal_eval(query_result_stats.result))
+            list_stats_result = []
+            
+            for stat in list_stats :
+                if(stat[1] != 'MAX' and stat[1] != 'MIN'):
+                    continue
+                else :
+                    list_stats_result.append(stat)
+
+            return render_template('index-violations.html', results=[list_metrics, list_stats_result])
         else :
-            return "<p>Errore</p>"
+            return "<p>Nessuna Metrica al momento è disponibile</p>"
+
+@app.route("/submitViolations", methods=['POST'])
+def submit_violations():
+    form_data = manage_data_form(request)
+    with grpc.insecure_channel(os.environ['ETL_DATA_PIPELINE_GRPC_SERVER']) as channel:
+        stub = echo_pb2_grpc.EchoServiceStub(channel)
+        result_future_violations = stub.getNumberOfViolationsFuture(echo_pb2.listMetricsParam(listMetrics=json.dumps(form_data)))
+
+        if len(result_future_violations.result) != 0  :
+            future_violations = ast.literal_eval(result_future_violations.result)
+            print(future_violations['sla_metrics'])
+            result = []
+            for metric in future_violations['sla_metrics'] :
+                for stat in metric['stats'] :
+                    result.append([metric['metric_name'], stat['name'], stat['threshold'], stat['violations'][0]['1h'], stat['violations'][1]['3h'], stat['violations'][2]['12h']])
+
+            return render_template('info_sla.html', results=result)
+        else :
+            return "<p>I dati non sono ancora pronti, riprovare più tardi</p>"
 
 """ Other Functions """
 

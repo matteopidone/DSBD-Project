@@ -3,15 +3,16 @@
     "range_time": "1w",
     "metrics" : [
         {
-            "name" : "availableMem",
+            "name" : "node_memory_MemAvailable_bytes",
             "labels" : {
-
+                "instance": "node-exporter:9100"
             }
         },
         {
             "name" : "node_disk_read_bytes_total",
             "labels" : {
-                
+                "device": "sda",
+                "instance": "node-exporter:9100"
             }
         },
         {

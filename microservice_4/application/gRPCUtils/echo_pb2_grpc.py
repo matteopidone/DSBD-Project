@@ -14,16 +14,6 @@ class EchoServiceStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.sendStats = channel.unary_unary(
-                '/echo.EchoService/sendStats',
-                request_serializer=echo__pb2.statsNameParam.SerializeToString,
-                response_deserializer=echo__pb2.resultValue.FromString,
-                )
-        self.sendMetrics = channel.unary_unary(
-                '/echo.EchoService/sendMetrics',
-                request_serializer=echo__pb2.statsNameParam.SerializeToString,
-                response_deserializer=echo__pb2.resultValue.FromString,
-                )
         self.getNumberOfViolationsPast = channel.unary_unary(
                 '/echo.EchoService/getNumberOfViolationsPast',
                 request_serializer=echo__pb2.listMetricsParam.SerializeToString,
@@ -34,22 +24,20 @@ class EchoServiceStub(object):
                 request_serializer=echo__pb2.listMetricsParam.SerializeToString,
                 response_deserializer=echo__pb2.resultValue.FromString,
                 )
+        self.getAllMetrics = channel.unary_unary(
+                '/echo.EchoService/getAllMetrics',
+                request_serializer=echo__pb2.emptyParam.SerializeToString,
+                response_deserializer=echo__pb2.resultValue.FromString,
+                )
+        self.getAllStatistics = channel.unary_unary(
+                '/echo.EchoService/getAllStatistics',
+                request_serializer=echo__pb2.emptyParam.SerializeToString,
+                response_deserializer=echo__pb2.resultValue.FromString,
+                )
 
 
 class EchoServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
-
-    def sendStats(self, request, context):
-        """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
-    def sendMetrics(self, request, context):
-        """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
 
     def getNumberOfViolationsPast(self, request, context):
         """Missing associated documentation comment in .proto file."""
@@ -63,19 +51,21 @@ class EchoServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def getAllMetrics(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def getAllStatistics(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_EchoServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'sendStats': grpc.unary_unary_rpc_method_handler(
-                    servicer.sendStats,
-                    request_deserializer=echo__pb2.statsNameParam.FromString,
-                    response_serializer=echo__pb2.resultValue.SerializeToString,
-            ),
-            'sendMetrics': grpc.unary_unary_rpc_method_handler(
-                    servicer.sendMetrics,
-                    request_deserializer=echo__pb2.statsNameParam.FromString,
-                    response_serializer=echo__pb2.resultValue.SerializeToString,
-            ),
             'getNumberOfViolationsPast': grpc.unary_unary_rpc_method_handler(
                     servicer.getNumberOfViolationsPast,
                     request_deserializer=echo__pb2.listMetricsParam.FromString,
@@ -84,6 +74,16 @@ def add_EchoServiceServicer_to_server(servicer, server):
             'getNumberOfViolationsFuture': grpc.unary_unary_rpc_method_handler(
                     servicer.getNumberOfViolationsFuture,
                     request_deserializer=echo__pb2.listMetricsParam.FromString,
+                    response_serializer=echo__pb2.resultValue.SerializeToString,
+            ),
+            'getAllMetrics': grpc.unary_unary_rpc_method_handler(
+                    servicer.getAllMetrics,
+                    request_deserializer=echo__pb2.emptyParam.FromString,
+                    response_serializer=echo__pb2.resultValue.SerializeToString,
+            ),
+            'getAllStatistics': grpc.unary_unary_rpc_method_handler(
+                    servicer.getAllStatistics,
+                    request_deserializer=echo__pb2.emptyParam.FromString,
                     response_serializer=echo__pb2.resultValue.SerializeToString,
             ),
     }
@@ -95,40 +95,6 @@ def add_EchoServiceServicer_to_server(servicer, server):
  # This class is part of an EXPERIMENTAL API.
 class EchoService(object):
     """Missing associated documentation comment in .proto file."""
-
-    @staticmethod
-    def sendStats(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/echo.EchoService/sendStats',
-            echo__pb2.statsNameParam.SerializeToString,
-            echo__pb2.resultValue.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
-
-    @staticmethod
-    def sendMetrics(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/echo.EchoService/sendMetrics',
-            echo__pb2.statsNameParam.SerializeToString,
-            echo__pb2.resultValue.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
     def getNumberOfViolationsPast(request,
@@ -160,6 +126,40 @@ class EchoService(object):
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/echo.EchoService/getNumberOfViolationsFuture',
             echo__pb2.listMetricsParam.SerializeToString,
+            echo__pb2.resultValue.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def getAllMetrics(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/echo.EchoService/getAllMetrics',
+            echo__pb2.emptyParam.SerializeToString,
+            echo__pb2.resultValue.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def getAllStatistics(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/echo.EchoService/getAllStatistics',
+            echo__pb2.emptyParam.SerializeToString,
             echo__pb2.resultValue.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

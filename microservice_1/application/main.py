@@ -17,10 +17,14 @@ sys.path.append('./gRPCUtils')
 
 import echo_pb2
 import echo_pb2_grpc
+from MetricCalculator import MetricCalculator
+from multiprocessing import Process, SimpleQueue
+from gRPCServer import serve
+
 
 """ Main Function """
 
-def main():
+def main(queue_metrics, queue_predictions):
 
     try:
         file = open("../config.json", "r")
@@ -34,7 +38,6 @@ def main():
     insert_metrics_on_data_storage(data['metrics'])
 
     prom = PrometheusConnect(url=os.environ['PROMETHEUS_SERVER'], disable_ssl=True)
-    
     """ Start metadata calculus """
     init_time = time()
     queryResult = prom.custom_query(query='{job="' + data['job'] +'"}[' + data['range_time'] +']')
@@ -49,15 +52,18 @@ def main():
                     thread_metadata = Thread(target=calculate_metadata_values, args=(init_monitoring_time, metricResultQuery['metric'], metric_values['value']))
                     thread_metadata.start()
                     break
-
     sleep_time = 600
     if os.environ.get('INTERVAL_TIME_SECONDS'):
         sleep_time = int(os.environ['INTERVAL_TIME_SECONDS'])
 
     interval_time_list = ['1h', '3h', '12h']
+    MetricCalculator.interval_time_list = interval_time_list
 
     """ Start statistics and predictions calculus """
     while True:
+        d = { '1h': list(), '3h': list(), '12h': list() }
+        data_predictions = []
+
         for metric in data['metrics']:
             for interval_time in interval_time_list:
                 
@@ -74,13 +80,22 @@ def main():
                     chunk_size=chunk_size,
                 )
                 metric_dataframe = MetricRangeDataFrame(metric_data)
+                d[interval_time].append({"__name__": metric['name'], 'values': metric_dataframe['value'].tolist()})
 
                 thread_stats = Thread(target=calculate_stats_values, args=(init_monitoring_time, metric, metric_dataframe, interval_time))
                 thread_stats.start()
+                
+                # Per la predizione programmaticamente utilizzo l'intervallo di tempo più lungo che ho (l'ultimo della lista).
                 if interval_time == interval_time_list[-1]:
-                    thread_prediction = Thread(target=calculate_prediction_values, args=(init_monitoring_time, metric, metric_dataframe))
-                    thread_prediction.start()
-
+                    predictions = calculate_prediction_values(init_monitoring_time, metric, metric_dataframe, queue_predictions)
+                    data_predictions.append(predictions)
+        
+        #Inserisco nelle code le metriche e le predizioni che utilizzerà il gRPC server
+        print("METRICHE " + str(d))
+        queue_metrics.put(str(d))
+        print("Predizioni " + str(data_predictions))
+        queue_predictions.put(str(data_predictions))
+        print("go to sleep")
         sleep(sleep_time)
 
 """ Functions """
@@ -106,7 +121,6 @@ def insert_stats_on_data_storage(metrics) :
 
 def insert_metrics_on_data_storage(metrics) :
     print("Waiting grpc server")
-    sleep(20.0)
     metric_to_insert = list()
     for metric in metrics :
         metric_to_insert.append(metric['name'])
@@ -221,7 +235,7 @@ def calculate_stats_values(init_monitoring_time, metric, metric_dataframe, inter
     message_producer.send_msg(data)
 
 """ Predictions calculus """
-def calculate_prediction_values(init_monitoring_time, metric, metric_dataframe):
+def calculate_prediction_values(init_monitoring_time, metric, metric_dataframe, queue_predictions):
 
     resampled_data = metric_dataframe['value'].resample(rule='1T')
     max = resampled_data.max()
@@ -237,12 +251,17 @@ def calculate_prediction_values(init_monitoring_time, metric, metric_dataframe):
     result_avg = prediction_avg.forecast(10).to_dict()
 
     list_max = []
+    list_max_prediction = []
     list_min = []
+    list_min_prediction = []
     list_avg = []
+    list_avg_prediction = []
     for key, value in result_max.items():
         list_max.append((str(key), str(value)))
+        list_max_prediction.append(str(value))
     for key, value in result_min.items():
         list_min.append((str(key), str(value)))
+        list_min_prediction.append(str(value))
     for key, value in result_avg.items():
         list_avg.append((str(key), str(value)))
 
@@ -270,7 +289,22 @@ def calculate_prediction_values(init_monitoring_time, metric, metric_dataframe):
         ]
     }
 
+    data_for_calculator = {
+        'name': metric['name'],
+        'type': 'prediction',
+        'values': [
+            {
+                'name': 'MAX',
+                'value': list_max_prediction
+            },
+            {
+                'name': 'MIN',
+                'value': list_min_prediction
+            }
+        ]
+    }
     message_producer.send_msg(data)
+    return data_for_calculator
 
 """ Start Main Script """
 
@@ -278,5 +312,11 @@ if __name__ == '__main__':
     broker = os.environ['KAFKA_BROKER']
     topic = os.environ['KAFKA_TOPIC']
     message_producer = MessageProducerClass(broker, topic)
+    #Queue che conterrà le metriche, permette la comunicazione tra questo processo ed il processo gRPC
+    queue_metrics = SimpleQueue()
+    #Queue che conterrà le predizioni, permette la comunicazione tra questo processo ed il processo gRPC
+    queue_predictions = SimpleQueue()
     log_monitor = LogMonitorClass()
-    main()
+    p = Process(target=serve, args=[queue_metrics, queue_predictions])
+    p.start()
+    main(queue_metrics, queue_predictions)
