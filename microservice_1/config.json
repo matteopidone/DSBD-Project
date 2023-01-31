@@ -21,6 +21,21 @@
                 "mode" : "idle",
                 "cpu" : "2"
             }
+        },
+        {
+            "name" : "node_filesystem_avail_bytes",
+            "labels" : {
+                "device" : "tmpfs",
+                "fstype" : "tmpfs",
+                "instance" : "node-exporter:9100",
+                "mountpoint": "/run"
+            }
+        },
+        {
+            "name" : "scrape_duration_seconds",
+            "labels" : {
+                "instance" : "node-exporter:9100"
+            }
         }
     ],
     "stats": [ "MIN", "MAX", "AVG", "DEV_STD" ]

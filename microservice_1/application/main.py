@@ -91,9 +91,7 @@ def main(queue_metrics, queue_predictions):
                     data_predictions.append(predictions)
         
         #Inserisco nelle code le metriche e le predizioni che utilizzerà il gRPC server
-        print("METRICHE " + str(d))
         queue_metrics.put(str(d))
-        print("Predizioni " + str(data_predictions))
         queue_predictions.put(str(data_predictions))
         print("go to sleep")
         sleep(sleep_time)
