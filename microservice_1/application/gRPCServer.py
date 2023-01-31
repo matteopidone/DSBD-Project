@@ -19,27 +19,6 @@ class EchoService(echo_pb2_grpc.EchoServiceServicer):
         self.message = ''
         self.message_predictions = ''
         super().__init__()
-        ''' Message expected from Etl_Data_pipeline
-        self.message = {
-            '1h': [
-                {
-                '__name__': 'availableMem',
-                'values': [12, 15,18]
-                }
-            ],
-            '3h': [
-                {
-                '__name__': 'availableMem',
-                'values': [12, 15, 18]
-                }
-            ],
-            '12h': [
-                {
-                '__name__': 'availableMem',
-                'values': [12, 15, 18]
-                }
-            ],
-        }'''
 
     def getNumberOfViolationsPast(self, request, context) :
         #Prendo l'ultimo messaggio dalla coda

@@ -20,7 +20,15 @@ def template_sla_manager():
         if len(query_result_metrics.result) != 0 and len(query_result_stats.result) != 0 :
             list_metrics = list(ast.literal_eval(query_result_metrics.result))
             list_stats = list(ast.literal_eval(query_result_stats.result))
-            return render_template('index.html', results=[list_metrics, list_stats])
+            list_stats_result = []
+            
+            for stat in list_stats :
+                if(stat[1] != 'MAX' and stat[1] != 'MIN'):
+                    continue
+                else :
+                    list_stats_result.append(stat)
+
+            return render_template('index.html', results=[list_metrics, list_stats_result])
         else :
             return "<p>Nessuna Metrica al momento è disponibile</p>"
 
@@ -51,7 +59,15 @@ def template_violation_prediction():
         if len(query_result_metrics.result) != 0 and len(query_result_stats.result) != 0 :
             list_metrics = list(ast.literal_eval(query_result_metrics.result))
             list_stats = list(ast.literal_eval(query_result_stats.result))
-            return render_template('index-violations.html', results=[list_metrics, list_stats])
+            list_stats_result = []
+            
+            for stat in list_stats :
+                if(stat[1] != 'MAX' and stat[1] != 'MIN'):
+                    continue
+                else :
+                    list_stats_result.append(stat)
+
+            return render_template('index-violations.html', results=[list_metrics, list_stats_result])
         else :
             return "<p>Nessuna Metrica al momento è disponibile</p>"
 

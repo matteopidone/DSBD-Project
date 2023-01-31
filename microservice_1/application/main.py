@@ -271,35 +271,35 @@ def calculate_prediction_values(init_monitoring_time, metric, metric_dataframe, 
     log_monitor.write_log_monitoring(message)
 
     data = {
-        "name": metric['name'],
-        "type": "prediction",
-        "values": [
+        'name': metric['name'],
+        'type': 'prediction',
+        'values': [
             {
-                "name": "MAX",
-                "value": json.dumps(list_max)
+                'name': 'MAX',
+                'value': json.dumps(list_max)
             },
             {
-                "name": "MIN",
-                "value": json.dumps(list_min)
+                'name': 'MIN',
+                'value': json.dumps(list_min)
             },
             {
-                "name": "AVG",
-                "value": json.dumps(list_avg)
+                'name': 'AVG',
+                'value': json.dumps(list_avg)
             }
         ]
     }
 
     data_for_calculator = {
-        "name": metric['name'],
-        "type": "prediction",
-        "values": [
+        'name': metric['name'],
+        'type': 'prediction',
+        'values': [
             {
-                "name": "MAX",
-                "value": list_max_prediction
+                'name': 'MAX',
+                'value': list_max_prediction
             },
             {
-                "name": "MIN",
-                "value": list_min_prediction
+                'name': 'MIN',
+                'value': list_min_prediction
             }
         ]
     }

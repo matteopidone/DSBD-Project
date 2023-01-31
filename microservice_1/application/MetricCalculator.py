@@ -5,46 +5,7 @@ class MetricCalculator :
     metrics = {}
     interval_time_list = list()
     numberOfViolations = []
-    numberViolationsPrototype = {
-    "sla_metrics" : [
-        {
-            "metric_name": "cpu",
-            "stats": [
-                {
-                    "name": "MAX",
-                    "threshold": 50
-                },
-                {
-                    "name": "MIN",
-                    "threshold": 20
-                }
-            ]
-        },
-        {
-            "metric_name": "disk",
-            "stats": [
-                {
-                    "name": "MAX",
-                    "threshold": 80,
-                    "violations": [
-                        {
-                            "time" :"1h",
-                            "value": 22
-                        },
-                        {
-                            "time" :"3h",
-                            "value": 22
-                        },
-                    ]
-                },
-                {
-                    "name": "MIN",
-                    "threshold": 35
-                }
-            ]
-        }
-    ]
-}
+
     ''' PAST VIOLATION FUNCTIONS '''
     def get_violation_from_all_hour(self, stat, metric_name, all_metrics) :
         dict_all_metrics = ast.literal_eval(all_metrics)
