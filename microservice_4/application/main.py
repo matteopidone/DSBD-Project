@@ -11,7 +11,7 @@ import json
 
 app = Flask(__name__)
 
-@app.route("/")
+@app.route("/pastViolation")
 def template_sla_manager():
     with grpc.insecure_channel(os.environ['DATA_STORAGE_GRPC_SERVER']) as channel:
         stub = echo_pb2_grpc.EchoServiceStub(channel)
@@ -28,11 +28,11 @@ def template_sla_manager():
                 else :
                     list_stats_result.append(stat)
 
-            return render_template('index.html', results=[list_metrics, list_stats_result])
+            return render_template('index-violations-past.html', results=[list_metrics, list_stats_result])
         else :
             return "<p>Nessuna Metrica al momento è disponibile</p>"
 
-@app.route("/submitSLA", methods=['POST'])
+@app.route("/submitPastViolations", methods=['POST'])
 def submit_sla():
     form_data = manage_data_form(request)
     with grpc.insecure_channel(os.environ['ETL_DATA_PIPELINE_GRPC_SERVER']) as channel:
@@ -46,11 +46,11 @@ def submit_sla():
                 for stat in metric['stats'] :
                     result.append([metric['metric_name'], stat['name'], stat['threshold'], stat['violations'][0]['1h'], stat['violations'][1]['3h'], stat['violations'][2]['12h']])
 
-            return render_template('info_sla.html', results=result)
+            return render_template('info-sla-past.html', results=result)
         else :
             return "<p>I dati non sono ancora pronti, riprovare più tardi</p>"
 
-@app.route("/violation")
+@app.route("/futureViolation")
 def template_violation_prediction():
     with grpc.insecure_channel(os.environ['DATA_STORAGE_GRPC_SERVER']) as channel:
         stub = echo_pb2_grpc.EchoServiceStub(channel)
@@ -67,11 +67,11 @@ def template_violation_prediction():
                 else :
                     list_stats_result.append(stat)
 
-            return render_template('index-violations.html', results=[list_metrics, list_stats_result])
+            return render_template('index-violations-future.html', results=[list_metrics, list_stats_result])
         else :
             return "<p>Nessuna Metrica al momento è disponibile</p>"
 
-@app.route("/submitViolations", methods=['POST'])
+@app.route("/submitFutureViolations", methods=['POST'])
 def submit_violations():
     form_data = manage_data_form(request)
     with grpc.insecure_channel(os.environ['ETL_DATA_PIPELINE_GRPC_SERVER']) as channel:
@@ -84,9 +84,9 @@ def submit_violations():
             result = []
             for metric in future_violations['sla_metrics'] :
                 for stat in metric['stats'] :
-                    result.append([metric['metric_name'], stat['name'], stat['threshold'], stat['violations'][0]['1h'], stat['violations'][1]['3h'], stat['violations'][2]['12h']])
+                    result.append([metric['metric_name'], stat['name'], stat['threshold'], stat['violations'][0]['10min']])
 
-            return render_template('info_sla.html', results=result)
+            return render_template('info-sla-future.html', results=result)
         else :
             return "<p>I dati non sono ancora pronti, riprovare più tardi</p>"
 

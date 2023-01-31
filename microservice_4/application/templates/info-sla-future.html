@@ -1,0 +1,32 @@
+<h1 class="microservice_title">SLA Manager - Violazioni SLA </h1>
+<body>
+    <table>
+        <tr>
+            <th>Nome Metrica</th>
+            <th>Nome dato</th>
+            <th>Soglia</th>
+            <th>Numero violazioni 10min</th>
+        </tr>
+        {% for row in results %}
+        <tr>
+            <td>{{ row[0] }}</td>
+            <td>{{ row[1] }}</td>
+            <td>{{ row[2] }}</td>
+            <td>{{ row[3] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+
+<style>
+body {
+    font-size: 25px;
+}
+
+/* Classes */
+
+.microservice_title {
+    font-size: 50px;
+    text-align: center;
+}
+</style>
