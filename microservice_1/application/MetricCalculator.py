@@ -70,22 +70,21 @@ class MetricCalculator :
 
     def get_violation_from_future(self, stat, metric_name, all_metrics) :
         list_metrics = ast.literal_eval(all_metrics)
-        for interval_time in ['1h', '3h', '12h'] :
-            for metric in list_metrics :
-                if( metric['name'] == metric_name ) :
-                    if( stat['name'] == 'MAX' ) :
-                        violation = 0
-                        for value in metric['values'][0]['value']:
-                            if float(value) > int(stat['threshold']):
-                                violation += 1
-                        stat['violations'].append({interval_time: violation})
+        for metric in list_metrics :
+            if( metric['name'] == metric_name ) :
+                if( stat['name'] == 'MAX' ) :
+                    violation = 0
+                    for value in metric['values'][0]['value']:
+                        if float(value) > int(stat['threshold']):
+                            violation += 1
+                    stat['violations'].append({'10min': violation})
 
-                    elif( stat['name'] == 'MIN' ) :
-                        violation = 0
-                        for value in metric['values'][1]['value']:
-                            if float(value) < int(stat['threshold']):
-                                violation += 1
-                        stat['violations'].append({interval_time: violation})
+                elif( stat['name'] == 'MIN' ) :
+                    violation = 0
+                    for value in metric['values'][1]['value']:
+                        if float(value) < int(stat['threshold']):
+                            violation += 1
+                    stat['violations'].append({'10min': violation})
 
         return stat
 
