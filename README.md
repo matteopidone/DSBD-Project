@@ -1,31 +1,32 @@
 # DSBD-Project
+University project related to Distributed Systems and Big Data.
 
-## Configurazione
-Dopo aver clonato il repository, eseguire il comando:
+## Configuration
+After cloning the repository, execute the command:
 
 ```bash
 docker compose up
 ```
 
-All'avvio di ogni container, verranno eseguite operazioni di routine necessarie per l'utilizzo del sistema: creazione di tabelle, inserimento di valori iniziali, setup comunicazioni, avvio processi ecc.
+Upon the start of each container, routine operations necessary for the system's use will be performed: table creation, insertion of initial values, communication setup, process startup, etc.
 
-<strong>Si stima un tempo di start (per i motivi citati sopra) pari a circa 3-4 minuti.</strong>
+<strong>An estimated startup time (for the reasons mentioned above) is approximately 3-4 minutes.</strong>
 
-Si rimanda alla sezione `Configurazione` (<a href ="https://github.com/matteopidone/DSBD-Project/blob/main/Relazione%20Progetto%20DSBD.pdf" target="_blank">Documentazione Progetto</a>) per tutti i dettagli relativi a questa fase.
+Refer to the `Configuration` section (<a href="https://github.com/matteopidone/DSBD-Project/blob/main/Relazione%20Progetto%20DSBD.pdf" target="_blank">Project Documentation</a>) for all details related to this phase.
 
-In caso di fallimento del processo di building (kafka errors, healthcheck failed ecc..) è necessario eseguire:
+In case of a failed building process (kafka errors, health check failed, etc.), it is necessary to execute:
 ```bash
 docker compose down && docker compose up
 ```
 
-### Requisiti
-Si consiglia di dedicare almeno 3/4 GB di RAM a Docker Desktop per evitare problemi di terminazione improvvisa dei processi all'interno dell' `ETL Data Pipeline` (`Error 137, Error 0`)
+### Requirements
+It is recommended to allocate at least 3/4 GB of RAM to Docker Desktop to avoid sudden termination issues of processes within the `ETL Data Pipeline` (`Error 137, Error 0`)
 
 ## Data Retrieval
-Porta 9003
- - Metriche: `localhost:9003/` <a href ="http://localhost:9003" target="_blank">Clicca qui</a>
+Port 9003
+ - Metrics: `localhost:9003/` <a href="http://localhost:9003" target="_blank">Click here</a>
 
 ## SLA Manager
-Porta 9004 
-- Numero violazioni passate: `localhost:9004/pastViolation` <a href ="http://localhost:9004/pastViolation" target="_blank">Clicca qui</a>
-- Indicazione sulle possibili violazioni: `localhost:9004/futureViolation` <a href ="http://localhost:9004/futureViolation" target="_blank">Clicca qui</a>
+Port 9004
+- Past violation count: `localhost:9004/pastViolation` <a href="http://localhost:9004/pastViolation" target="_blank">Click here</a>
+- Indication of possible violations: `localhost:9004/futureViolation` <a href="http://localhost:9004/futureViolation" target="_blank">Click here</a>
